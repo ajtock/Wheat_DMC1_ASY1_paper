@@ -1,5 +1,5 @@
 SAMPLES: ["BSseq_Rep8a_SRR6792678"]
-THREADS: 32
+THREADS: 48
 ## Trim Galore!
 TRIM:
   # Trim 10 bp off read 5' ends
@@ -14,13 +14,13 @@ MAPPING:
   # data/index/bismark_genome_preparation.sh;
   # i.e., a subdirectory named "Bisulfite_Genome".
   # It must also contain the FASTA file from which the
-  # index was built (e.g., wheat_v1.0.fa),
-  # and a chromosome sizes file (e.g., wheat_v1.0.fa.sizes),
+  # index was built (e.g., wheat_v1.0_incl_organelles_controls.fa),
+  # and a chromosome sizes file (e.g., wheat_v1.0_incl_organelles_controls.fa.sizes),
   # generated with:
-  # samtools faidx wheat_v1.0.fa; cut -f1,2 wheat_v1.0.fa.fai > wheat_v1.0.fa.sizes
+  # samtools faidx wheat_v1.0_incl_organelles_controls.fa; cut -f1,2 wheat_v1.0_incl_organelles_controls.fa.fai > wheat_v1.0_incl_organelles_controls.fa.sizes
   reference: "data/index/"
   # reference_prefix is used for naming alignment output files;
-  # this should be the name of the FASTA file (e.g., wheat_v1.0.fa)
+  # this should be the name of the FASTA file (e.g., wheat_v1.0_incl_organelles_controls.fa)
   # without the .fa extension
   reference_prefix: "wheat_v1.0_incl_organelles_controls"
   extra_params_bismark: ""

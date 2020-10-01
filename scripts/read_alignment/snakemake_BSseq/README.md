@@ -1,306 +1,256 @@
 # snakemake\_BSseq
 
 ## Automated workflow for whole-genome BS-seq (Illumina) and EM-Seq (NEB) data
+
 This is a Snakemake workflow for automated processing of DNA methylation data derived from whole-genome bisulfite sequencing (BS-seq or WGBS) or NEBNext Enzymatic Methyl-seq (EM-seq):
 - [**BS-seq**](https://en.wikipedia.org/wiki/Bisulfite_sequencing)
 - [**EM-seq**](https://international.neb.com/about-neb/news-and-press-releases/new-england-biolabs-to-present-latest-innovations-for-ngs-sample-preparation-at-agbt-2017)
 
 Both BS-seq and EM-seq produce the same kind of data, so no adjustment for post-processing is needed.
 
-***IMPORTANT***: This Snakemake pipeline should not be run with Bismark version 0.21.0 or later due to the addition of HISAT2 support, which requires Python 2, which conflicts with the Python 3 requirements of other parts of this pipeline (e.g., the pigz part of the trim\_galore rule).
+***IMPORTANT***: This Snakemake pipeline should not be run with Bismark version 0.21.0 or later due to the addition of HISAT2 support, which requires Python 2, which conflicts with the Python 3 requirements of other parts of this pipeline (e.g., the pigz part of the `trim_galore` rule).
 
-## Requirements
-- demultiplexed fastq.gz files located in `data` directory. They need to be in the form `{sample}_R1.fastq.gz`
-- `Snakefile` in this repository. This contains "rules" that each execute a step in the workflow
-- `config.yaml` in this repository. This contains customizable parameters
-- Optional: `environment.yaml`, used to create the software environment if conda is used
+### Requirements
+
 - Installation of [snakemake](https://snakemake.readthedocs.io/en/stable/) and optionally [conda](https://conda.io/docs/)
-- If conda is not used, `bismark`, `bowtie2`, `fastqc`, `trim_galore`, `samtools`, `deeptools`, `ucsc-bedgraphtobigwig` and `python3` need to be specified in the PATH variable
+- Demultiplexed paired-end reads in gzipped FASTQ format located in the `data/` directory. These should be named according to the following naming convention: `{sample}_R1.fastq.gz` and `{sample}_R2.fastq.gz`
+- A reference genome in FASTA format (e.g., `wheat_v1.0_incl_organelles_controls.fa`) and a chromosome sizes file (e.g., `wheat_v1.0_incl_organelles_controls.fa.sizes`, generated with `samtools faidx wheat_v1.0_incl_organelles_controls.fa; cut -f1,2 wheat_v1.0_incl_organelles_controls.fa.fai > wheat_v1.0_incl_organelles_controls.fa.sizes`), both located in `data/index/`. No other FASTA format files should be located in this directory
+- A bisulfite-converted reference genome index for bowtie2, located in `data/index/` (see `data/index/bismark_genome_preparation.sh` for an example of how to generate `data/index/Bisulfite_Genome/`)
+- `Snakefile` in this repository. This contains "rules" that each execute a step in the workflow
+- `config.yaml` in this repository. This contains customizable parameters including `reference_prefix`, which should be the reference genome file name without the `.fa` extension (e.g., `wheat_v1.0_incl_organelles_controls`)
+- Optional: `environment.yaml` in this repository, used to create the software environment if conda is used
+- If conda is not used, `bismark`, `bowtie2`, `fastqc`, `trim_galore`, `samtools`, `deeptools`, `ucsc-bedgraphtobigwig` and `python3` must be specified in the PATH variable
 
-The above files can be downloaded together by cloning the repository:
+This repository can be downloaded with:
 
 ```
 git clone https://github.com/ajtock/Wheat_DMC1_ASY1_paper/scripts/read_alignment/snakemake_BSseq/
 ```
-Or individually (e.g., the `Snakefile`) using `wget`:
+
+Alternatively, individual files (e.g., `Snakefile`) can be downloaded using `wget`:
 
 ```
-wget https://raw.githubusercontent.com/seb-mueller/snakemake_sRNAseq/master/Snakefile
+wget https://raw.githubusercontent.com/ajtock/Wheat_DMC1_ASY1_paper/scripts/read_alignment/snakemake_BSseq/Snakefile
 ```
 
-## Creating the conda environment
+### Creating the conda environment
+
 ```
 conda env create --file environment.yaml --name BSseq_mapping
 ```
 
-## Activating and deactivating the environment
-```
-conda activate BSseq_mapping
-```
+### Usage
+
+In a Unix shell, navigate to the base directory containing `Snakefile`, `config.yaml`, `environment.yaml`, and the `data\` subdirectory, which should have a directory tree structure like this:
 
 ```
+.
+├── config.yaml
+├── data
+│   ├── BSseq_Rep8a_SRR6792678_R1.fastq.gz
+│   ├── BSseq_Rep8a_SRR6792678_R2.fastq.gz
+│   └── index
+│       ├── bismark_genome_preparation.sh
+│       ├── Bisulfite_Genome
+│       │   ├── CT_conversion
+│       │   │   ├── BS_CT.1.bt2l
+│       │   │   ├── BS_CT.2.bt2l
+│       │   │   ├── BS_CT.3.bt2l
+│       │   │   ├── BS_CT.4.bt2l
+│       │   │   ├── BS_CT.rev.1.bt2l
+│       │   │   ├── BS_CT.rev.2.bt2l
+│       │   │   └── genome_mfa.CT_conversion.fa
+│       │   └── GA_conversion
+│       │       ├── BS_GA.1.bt2l
+│       │       ├── BS_GA.2.bt2l
+│       │       ├── BS_GA.3.bt2l
+│       │       ├── BS_GA.4.bt2l
+│       │       ├── BS_GA.rev.1.bt2l
+│       │       ├── BS_GA.rev.2.bt2l
+│       │       └── genome_mfa.GA_conversion.fa
+│       ├── cat_wheat_nuclear_chloroplast_mitochondrial_genomes_and_control_sequences.sh
+│       ├── genomic_nucleotide_frequencies.txt
+│       ├── README_chloroplast_Lambda_pUC19_control_sequences.txt
+│       ├── samtools_faidx_chr_sizes.sh
+│       ├── separate_nuclear_organelles_controls
+│       │   ├── lambda_NEB.fa
+│       │   ├── pUC19_NEB.fa
+│       │   ├── wheat_CS_chloroplast_genome.fa
+│       │   ├── wheat_CS_mitochondrial_genome.fa
+│       │   └── wheat_v1.0.fa
+│       ├── wheat_v1.0_incl_organelles_controls.fa
+│       ├── wheat_v1.0_incl_organelles_controls.fa.fai
+│       └── wheat_v1.0_incl_organelles_controls.fa.sizes
+├── environment.yaml
+├── README.md
+└── Snakefile
+```
+
+Then run the following commands in the base directory (`--cores` should match the `THREADS` parameter in `config.yaml`):
+
+```
+conda activate BSseq_mapping
+snakemake -p --cores 48
 conda deactivate
 ```
 
-## Genome preparation
-The pipeline requires a bismark index file which might have to be created at first.
-This best done having the reference genome as fasta file located in a directory by itself (there shouldn't be any other fasta files since bismark works in mysterious ways and you can't specify a conrete file, just the directory).
+### Useful Snakemake parameters
 
-Say our genome is located here: `ref/genome/mygenome.fa` with no other fa files in it.
-Run bismark indexer which will create a folder within that:
-
-```
-bismark_genome_preparation ref/genome 
-```
-This will create `ref/genome/Bisulfite_Genome`.
-To let the pipeline know where the index is located, change the `config.yaml`:
-
-```
-  reference: "ref/genome/"
-  reference_short: "mygenome"
-```
-
-Also, the fasta-index is required at some point and should be generated in the same directory as follows:
-
-```
-samtools faidx mygenome.fa
-```
-
-
-# Usage:
-
-Navigate in a Unix shell to the base directory contains the files listed above plus the `data` directory including the data like int this example:
-
-```
-
-.
-├── bsseq.makefile
-├── config.yaml
-├── data
-│   ├── bsseq_sample1_R1.fastq.gz
-│   ├── bsseq_sample1_R2.fastq.gz
-│   ├── bsseq_sample2_R1.fastq.gz
-│   └── bsseq_sample2_R2.fastq.gz
-├── environment.yaml
-├── README.md
-├── samples.csv
-└── Snakefile
-
-```
-
-The `sample.csv` could look something like this:
-```
-library,optional_info
-bsseq_sample1,WT
-bsseq_sample2,Mutant
-```
-
-Then just run snakmake in base directory:
-
-
-```
-snakemake
-```
-## useful parameters:
-- `--cores` max number of threads
-- `-n` dryrun
-- `-p` print commands
+- `--cores` specifies the maximum number of threads
+- `-n` performs a dry run
+- `-p` prints commands
 - `--use-conda`
 - `--conda-prefix ~/.myconda`
-- `--forcerun postmapping` forces rerun of a given rule (e.g. `postmapping`)
+- `--forcerun bismark2bedGraph` forces rerun of a given rule (e.g., `bismark2bedGraph`)
 
+### Outputs
 
-# Output:
+Below is the directory tree structure including files generated once the Snakemake workflow has run to completion.
 
-`trimmed`, `log` and `mapped` directory with trimming and mapping results.
-
-Below is the structure of all generated files once the pipeline is finished:
 ```
 .
 ├── config.yaml
 ├── coverage
-│   ├── bseq_sample2_MappedOn_chloroplast_CHH.gz
-│   ├── bseq_sample2_MappedOn_chloroplast_CHH.gz.bismark.cov.gz
-│   ├── bsseq_sample1_MappedOn_chloroplast_CHG
-│   ├── bsseq_sample1_MappedOn_chloroplast_CHG.bw
-│   ├── bsseq_sample1_MappedOn_chloroplast_CHG.CX_report.txt
-│   ├── bsseq_sample1_MappedOn_chloroplast_CHG.gz.bismark.cov
-│   ├── bsseq_sample1_MappedOn_chloroplast_CHH
-│   ├── bsseq_sample1_MappedOn_chloroplast_CHH.bw
-│   ├── bsseq_sample1_MappedOn_chloroplast_CHH.CX_report.txt
-│   ├── bsseq_sample1_MappedOn_chloroplast_CHH.gz.bismark.cov
-│   ├── bsseq_sample1_MappedOn_chloroplast_CpG
-│   ├── bsseq_sample1_MappedOn_chloroplast_CpG.bw
-│   ├── bsseq_sample1_MappedOn_chloroplast_CpG.CX_report.txt
-│   ├── bsseq_sample1_MappedOn_chloroplast_CpG.gz.bismark.cov
-│   ├── bsseq_sample2_MappedOn_chloroplast_CHG
-│   ├── bsseq_sample2_MappedOn_chloroplast_CHG.bw
-│   ├── bsseq_sample2_MappedOn_chloroplast_CHG.CX_report.txt
-│   ├── bsseq_sample2_MappedOn_chloroplast_CHG.gz.bismark.cov
-│   ├── bsseq_sample2_MappedOn_chloroplast_CHH
-│   ├── bsseq_sample2_MappedOn_chloroplast_CHH.bw
-│   ├── bsseq_sample2_MappedOn_chloroplast_CHH.CX_report.txt
-│   ├── bsseq_sample2_MappedOn_chloroplast_CHH.gz.bismark.cov
-│   ├── bsseq_sample2_MappedOn_chloroplast_CpG
-│   ├── bsseq_sample2_MappedOn_chloroplast_CpG.bw
-│   ├── bsseq_sample2_MappedOn_chloroplast_CpG.CX_report.txt
-│   └── bsseq_sample2_MappedOn_chloroplast_CpG.gz.bismark.cov
+│   ├── BSseq_Rep8a_SRR6792678_MappedOn_wheat_v1.0_incl_organelles_controls_dedup_CHG
+│   ├── BSseq_Rep8a_SRR6792678_MappedOn_wheat_v1.0_incl_organelles_controls_dedup_CHG.gz
+│   ├── BSseq_Rep8a_SRR6792678_MappedOn_wheat_v1.0_incl_organelles_controls_dedup_CHG.gz.bismark.cov
+│   ├── BSseq_Rep8a_SRR6792678_MappedOn_wheat_v1.0_incl_organelles_controls_dedup_CHG.gz.bismark.cov.gz
+│   ├── BSseq_Rep8a_SRR6792678_MappedOn_wheat_v1.0_incl_organelles_controls_dedup_CHH
+│   ├── BSseq_Rep8a_SRR6792678_MappedOn_wheat_v1.0_incl_organelles_controls_dedup_CHH.gz
+│   ├── BSseq_Rep8a_SRR6792678_MappedOn_wheat_v1.0_incl_organelles_controls_dedup_CHH.gz.bismark.cov
+│   ├── BSseq_Rep8a_SRR6792678_MappedOn_wheat_v1.0_incl_organelles_controls_dedup_CHH.gz.bismark.cov.gz
+│   ├── BSseq_Rep8a_SRR6792678_MappedOn_wheat_v1.0_incl_organelles_controls_dedup_CpG
+│   ├── BSseq_Rep8a_SRR6792678_MappedOn_wheat_v1.0_incl_organelles_controls_dedup_CpG.gz
+│   ├── BSseq_Rep8a_SRR6792678_MappedOn_wheat_v1.0_incl_organelles_controls_dedup_CpG.gz.bismark.cov
+│   ├── BSseq_Rep8a_SRR6792678_MappedOn_wheat_v1.0_incl_organelles_controls_dedup_CpG.gz.bismark.cov.gz
+│   ├── bw
+│   │   ├── BSseq_Rep8a_SRR6792678_MappedOn_wheat_v1.0_incl_organelles_controls_dedup_CHG.bw
+│   │   ├── BSseq_Rep8a_SRR6792678_MappedOn_wheat_v1.0_incl_organelles_controls_dedup_CHH.bw
+│   │   └── BSseq_Rep8a_SRR6792678_MappedOn_wheat_v1.0_incl_organelles_controls_dedup_CpG.bw
+│   └── report
+│       ├── BSseq_Rep8a_SRR6792678_MappedOn_wheat_v1.0_incl_organelles_controls_dedup_CHG.CX_report.txt.gz
+│       ├── BSseq_Rep8a_SRR6792678_MappedOn_wheat_v1.0_incl_organelles_controls_dedup_CHH.CX_report.txt.gz
+│       └── BSseq_Rep8a_SRR6792678_MappedOn_wheat_v1.0_incl_organelles_controls_dedup_CpG.CX_report.txt.gz
 ├── data
-│   ├── bsseq_sample1_R1.fastq.gz
-│   ├── bsseq_sample1_R2.fastq.gz
-│   ├── bsseq_sample2_R1.fastq.gz
-│   ├── bsseq_sample2_R2.fastq.gz
+│   ├── BSseq_Rep8a_SRR6792678_R1.fastq.gz
+│   ├── BSseq_Rep8a_SRR6792678_R2.fastq.gz
 │   └── index
-│       ├── Bisulfite_Genome
-│       │   ├── CT_conversion
-│       │   │   ├── BS_CT.1.bt2
-│       │   │   ├── BS_CT.2.bt2
-│       │   │   ├── BS_CT.3.bt2
-│       │   │   ├── BS_CT.4.bt2
-│       │   │   ├── BS_CT.rev.1.bt2
-│       │   │   ├── BS_CT.rev.2.bt2
-│       │   │   └── genome_mfa.CT_conversion.fa
-│       │   └── GA_conversion
-│       │       ├── BS_GA.1.bt2
-│       │       ├── BS_GA.2.bt2
-│       │       ├── BS_GA.3.bt2
-│       │       ├── BS_GA.4.bt2
-│       │       ├── BS_GA.rev.1.bt2
-│       │       ├── BS_GA.rev.2.bt2
-│       │       └── genome_mfa.GA_conversion.fa
-│       ├── chloroplast.fa
-│       ├── chloroplast.fa.fai
-│       └── genomic_nucleotide_frequencies.txt
+│       ├── bismark_genome_preparation.sh
+│       ├── Bisulfite_Genome
+│       │   ├── CT_conversion
+│       │   │   ├── BS_CT.1.bt2l
+│       │   │   ├── BS_CT.2.bt2l
+│       │   │   ├── BS_CT.3.bt2l
+│       │   │   ├── BS_CT.4.bt2l
+│       │   │   ├── BS_CT.rev.1.bt2l
+│       │   │   ├── BS_CT.rev.2.bt2l
+│       │   │   └── genome_mfa.CT_conversion.fa
+│       │   └── GA_conversion
+│       │       ├── BS_GA.1.bt2l
+│       │       ├── BS_GA.2.bt2l
+│       │       ├── BS_GA.3.bt2l
+│       │       ├── BS_GA.4.bt2l
+│       │       ├── BS_GA.rev.1.bt2l
+│       │       ├── BS_GA.rev.2.bt2l
+│       │       └── genome_mfa.GA_conversion.fa
+│       ├── cat_wheat_nuclear_chloroplast_mitochondrial_genomes_and_control_sequences.sh
+│       ├── genomic_nucleotide_frequencies.txt
+│       ├── README_chloroplast_Lambda_pUC19_control_sequences.txt
+│       ├── samtools_faidx_chr_sizes.sh
+│       ├── separate_nuclear_organelles_controls
+│       │   ├── lambda_NEB.fa
+│       │   ├── pUC19_NEB.fa
+│       │   ├── wheat_CS_chloroplast_genome.fa
+│       │   ├── wheat_CS_mitochondrial_genome.fa
+│       │   └── wheat_v1.0.fa
+│       ├── wheat_v1.0_incl_organelles_controls.fa
+│       ├── wheat_v1.0_incl_organelles_controls.fa.fai
+│       └── wheat_v1.0_incl_organelles_controls.fa.sizes
 ├── environment.yaml
 ├── logs
+│   ├── bamCoverage
+│   │   └── BSseq_Rep8a_SRR6792678_MappedOn_wheat_v1.0_incl_organelles_controls_dedup_sort_bw.log
+│   ├── bedGraphToBigWig
+│   │   ├── BSseq_Rep8a_SRR6792678_MappedOn_wheat_v1.0_incl_organelles_controls_dedup_CHG_bedGraphToBigWig.log
+│   │   ├── BSseq_Rep8a_SRR6792678_MappedOn_wheat_v1.0_incl_organelles_controls_dedup_CHH_bedGraphToBigWig.log
+│   │   └── BSseq_Rep8a_SRR6792678_MappedOn_wheat_v1.0_incl_organelles_controls_dedup_CpG_bedGraphToBigWig.log
 │   ├── bismark
-│   │   ├── bsseq_sample1.
-│   │   ├── bsseq_sample1_CHG_MappedOn_chloroplast.methylation_extractor.log
-│   │   ├── bsseq_sample1_CHH_MappedOn_chloroplast.methylation_extractor.log
-│   │   ├── bsseq_sample1_CpG_MappedOn_chloroplast.methylation_extractor.log
-│   │   ├── bsseq_sample1.log
-│   │   ├── bsseq_sample1_MappedOn_chloroplast_CHG.bedGraphToBigWig.log
-│   │   ├── bsseq_sample1_MappedOn_chloroplast_CHG.bismark2bedGraph.log
-│   │   ├── bsseq_sample1_MappedOn_chloroplast_CHG.coverage2cytosine.log
-│   │   ├── bsseq_sample1_MappedOn_chloroplast_CHH.bedGraphToBigWig.log
-│   │   ├── bsseq_sample1_MappedOn_chloroplast_CHH.bismark2bedGraph.log
-│   │   ├── bsseq_sample1_MappedOn_chloroplast_CHH.coverage2cytosine.log
-│   │   ├── bsseq_sample1_MappedOn_chloroplast_CpG.bedGraphToBigWig.log
-│   │   ├── bsseq_sample1_MappedOn_chloroplast_CpG.bismark2bedGraph.log
-│   │   ├── bsseq_sample1_MappedOn_chloroplast_CpG.coverage2cytosine.log
-│   │   ├── bsseq_sample1_MappedOn_chloroplast.deduplication.log
-│   │   ├── bsseq_sample1_MappedOn_chloroplast.log
-│   │   ├── bsseq_sample1_MappedOn_chloroplast.methylation_extractor.log
-│   │   ├── bsseq_sample2_CHG_MappedOn_chloroplast.methylation_extractor.log
-│   │   ├── bsseq_sample2_CHH_MappedOn_chloroplast.methylation_extractor.log
-│   │   ├── bsseq_sample2_CpG_MappedOn_chloroplast.methylation_extractor.log
-│   │   ├── bsseq_sample2.log
-│   │   ├── bsseq_sample2_MappedOn_chloroplast_CHG.bedGraphToBigWig.log
-│   │   ├── bsseq_sample2_MappedOn_chloroplast_CHG.bismark2bedGraph.log
-│   │   ├── bsseq_sample2_MappedOn_chloroplast_CHG.coverage2cytosine.log
-│   │   ├── bsseq_sample2_MappedOn_chloroplast_CHH.bedGraphToBigWig.log
-│   │   ├── bsseq_sample2_MappedOn_chloroplast_CHH.bismark2bedGraph.log
-│   │   ├── bsseq_sample2_MappedOn_chloroplast_CHH.coverage2cytosine.log
-│   │   ├── bsseq_sample2_MappedOn_chloroplast_CpG.bedGraphToBigWig.log
-│   │   ├── bsseq_sample2_MappedOn_chloroplast_CpG.bismark2bedGraph.log
-│   │   ├── bsseq_sample2_MappedOn_chloroplast_CpG.coverage2cytosine.log
-│   │   ├── bsseq_sample2_MappedOn_chloroplast.deduplication.log
-│   │   ├── bsseq_sample2_MappedOn_chloroplast.log
-│   │   └── bsseq_sample2_MappedOn_chloroplast.methylation_extractor.log
-│   ├── cutadapt
-│   │   ├── bsseq_sample1_R1.log
-│   │   ├── bsseq_sample1_R2.log
-│   │   ├── bsseq_sample2_R1.log
-│   │   └── bsseq_sample2_R2.log
-│   └── fastqc
-│       └── raw
-│           ├── bsseq_sample1_R1_fastqc.html
-│           ├── bsseq_sample1_R1_fastqc.zip
-│           ├── bsseq_sample1_R2_fastqc.html
-│           ├── bsseq_sample1_R2_fastqc.zip
-│           ├── bsseq_sample2_R1_fastqc.html
-│           ├── bsseq_sample2_R1_fastqc.zip
-│           ├── bsseq_sample2_R2_fastqc.html
-│           └── bsseq_sample2_R2_fastqc.zip
+│   │   ├── BSseq_Rep2a_SRR6792682_MappedOn_wheat_v1.0_incl_organelles_controls.log
+│   │   ├── BSseq_Rep8a_SRR6792678_MappedOn_wheat_v1.0_incl_organelles_controls.log
+│   │   ├── BSseq_Rep8a_SRR6792678_MappedOn_wheat_v1.0_incl_organelles_controls.nucleotide_stats.txt
+│   │   └── BSseq_Rep8a_SRR6792678_MappedOn_wheat_v1.0_incl_organelles_controls_report.txt
+│   ├── bismark2bedGraph
+│   │   ├── BSseq_Rep8a_SRR6792678_MappedOn_wheat_v1.0_incl_organelles_controls_dedup_CHG_bismark2bedGraph.log
+│   │   ├── BSseq_Rep8a_SRR6792678_MappedOn_wheat_v1.0_incl_organelles_controls_dedup_CHH_bismark2bedGraph.log
+│   │   └── BSseq_Rep8a_SRR6792678_MappedOn_wheat_v1.0_incl_organelles_controls_dedup_CpG_bismark2bedGraph.log
+│   ├── coverage2cytosine
+│   │   ├── BSseq_Rep8a_SRR6792678_MappedOn_wheat_v1.0_incl_organelles_controls_dedup_CHG_coverage2cytosine.log
+│   │   ├── BSseq_Rep8a_SRR6792678_MappedOn_wheat_v1.0_incl_organelles_controls_dedup_CHH_coverage2cytosine.log
+│   │   └── BSseq_Rep8a_SRR6792678_MappedOn_wheat_v1.0_incl_organelles_controls_dedup_CpG_coverage2cytosine.log
+│   ├── deduplicate_bismark
+│   │   ├── BSseq_Rep8a_SRR6792678_MappedOn_wheat_v1.0_incl_organelles_controls_dedup.log
+│   │   └── BSseq_Rep8a_SRR6792678_MappedOn_wheat_v1.0_incl_organelles_controls_dedup_report.txt
+│   ├── fastqc
+│   │   ├── raw
+│   │   │   ├── BSseq_Rep2a_SRR6792682_R1_fastqc.html
+│   │   │   ├── BSseq_Rep2a_SRR6792682_R1_fastqc.zip
+│   │   │   ├── BSseq_Rep2a_SRR6792682_R1.log
+│   │   │   ├── BSseq_Rep2a_SRR6792682_R2_fastqc.html
+│   │   │   ├── BSseq_Rep2a_SRR6792682_R2_fastqc.zip
+│   │   │   ├── BSseq_Rep2a_SRR6792682_R2.log
+│   │   │   ├── BSseq_Rep8a_SRR6792678_R1_fastqc.html
+│   │   │   ├── BSseq_Rep8a_SRR6792678_R1_fastqc.zip
+│   │   │   ├── BSseq_Rep8a_SRR6792678_R1.log
+│   │   │   ├── BSseq_Rep8a_SRR6792678_R2_fastqc.html
+│   │   │   ├── BSseq_Rep8a_SRR6792678_R2_fastqc.zip
+│   │   │   └── BSseq_Rep8a_SRR6792678_R2.log
+│   │   └── trimmed
+│   │       ├── BSseq_Rep2a_SRR6792682_R1_trimmed_fastqc.html
+│   │       ├── BSseq_Rep2a_SRR6792682_R1_trimmed_fastqc.zip
+│   │       ├── BSseq_Rep2a_SRR6792682_R1_trimmed.log
+│   │       ├── BSseq_Rep2a_SRR6792682_R2_trimmed_fastqc.html
+│   │       ├── BSseq_Rep2a_SRR6792682_R2_trimmed_fastqc.zip
+│   │       ├── BSseq_Rep2a_SRR6792682_R2_trimmed.log
+│   │       ├── BSseq_Rep8a_SRR6792678_R1_trimmed_fastqc.html
+│   │       ├── BSseq_Rep8a_SRR6792678_R1_trimmed_fastqc.zip
+│   │       ├── BSseq_Rep8a_SRR6792678_R1_trimmed.log
+│   │       ├── BSseq_Rep8a_SRR6792678_R2_trimmed_fastqc.html
+│   │       ├── BSseq_Rep8a_SRR6792678_R2_trimmed_fastqc.zip
+│   │       └── BSseq_Rep8a_SRR6792678_R2_trimmed.log
+│   ├── methylation_extractor
+│   │   └── BSseq_Rep8a_SRR6792678_MappedOn_wheat_v1.0_incl_organelles_controls_dedup_methylation_extractor.log
+│   └── trim_galore
+│       ├── BSseq_Rep2a_SRR6792682_R1.fastq.gz_trimming_report.txt
+│       ├── BSseq_Rep2a_SRR6792682_R2.fastq.gz_trimming_report.txt
+│       ├── BSseq_Rep2a_SRR6792682_trimmed.log
+│       ├── BSseq_Rep8a_SRR6792678_R1.fastq.gz_trimming_report.txt
+│       ├── BSseq_Rep8a_SRR6792678_R2.fastq.gz_trimming_report.txt
+│       └── BSseq_Rep8a_SRR6792678_trimmed.log
 ├── mapped
-│   ├── bsseq_sample1_MappedOn_chloroplast_trim_bismark_pe.bam
-│   ├── bsseq_sample1_MappedOn_chloroplast_trim_bismark_pe.deduplicated.bam
-│   ├── bsseq_sample1_MappedOn_chloroplast_trim_bismark_pe.deduplicated.sorted.bam
-│   ├── bsseq_sample1_MappedOn_chloroplast_trim_bismark_pe.deduplicated.sorted.bam.bai
-│   ├── bsseq_sample1_MappedOn_chloroplast_trim_bismark_pe.deduplicated.sorted.bw
-│   ├── bsseq_sample1_MappedOn_chloroplast_trim_bismark_pe.deduplication_report.txt
-│   ├── bsseq_sample1_MappedOn_chloroplast_trim_bismark_pe.nucleotide_stats.txt
-│   ├── bsseq_sample1_MappedOn_chloroplast_trim_bismark_PE_report.txt
-│   ├── bsseq_sample2_MappedOn_chloroplast_trim_bismark_pe.bam
-│   ├── bsseq_sample2_MappedOn_chloroplast_trim_bismark_pe.deduplicated.bam
-│   ├── bsseq_sample2_MappedOn_chloroplast_trim_bismark_pe.deduplicated.sorted.bam
-│   ├── bsseq_sample2_MappedOn_chloroplast_trim_bismark_pe.deduplicated.sorted.bam.bai
-│   ├── bsseq_sample2_MappedOn_chloroplast_trim_bismark_pe.deduplicated.sorted.bw
-│   ├── bsseq_sample2_MappedOn_chloroplast_trim_bismark_pe.deduplication_report.txt
-│   ├── bsseq_sample2_MappedOn_chloroplast_trim_bismark_pe.nucleotide_stats.txt
-│   ├── bsseq_sample2_MappedOn_chloroplast_trim_bismark_PE_report.txt
-│   ├── bws
-│   │   ├── bsseq_sample1_MappedOn_chloroplast_trim_bismark_pe.deduplicated.sorted.bw
-│   │   └── bsseq_sample2_MappedOn_chloroplast_trim_bismark_pe.deduplicated.sorted.bw
-│   └── test
+│   ├── BSseq_Rep8a_SRR6792678_MappedOn_wheat_v1.0_incl_organelles_controls.bam
+│   └── dedup
+│       ├── BSseq_Rep8a_SRR6792678_MappedOn_wheat_v1.0_incl_organelles_controls_dedup.bam
+│       ├── BSseq_Rep8a_SRR6792678_MappedOn_wheat_v1.0_incl_organelles_controls_dedup_sort.bam
+│       ├── BSseq_Rep8a_SRR6792678_MappedOn_wheat_v1.0_incl_organelles_controls_dedup_sort.bam.csi
+│       └── BSseq_Rep8a_SRR6792678_MappedOn_wheat_v1.0_incl_organelles_controls_dedup_sort.bw
 ├── methylation_extracted
-│   ├── bsseq_sample1_MappedOn_chloroplast_trim_bismark_pe.deduplicated.sorted.M-bias.txt
-│   ├── bsseq_sample1_MappedOn_chloroplast_trim_bismark_pe.deduplicated.sorted_splitting_report.txt
-│   ├── bsseq_sample2_MappedOn_chloroplast_trim_bismark_pe.deduplicated.sorted.M-bias.txt
-│   ├── bsseq_sample2_MappedOn_chloroplast_trim_bismark_pe.deduplicated.sorted_splitting_report.txt
-│   ├── CHG_context_bsseq_sample1_MappedOn_chloroplast_trim_bismark_pe.deduplicated.sorted.txt.gz
-│   ├── CHG_context_bsseq_sample2_MappedOn_chloroplast_trim_bismark_pe.deduplicated.sorted.txt
-│   ├── CHG_context_bsseq_sample2_MappedOn_chloroplast_trim_bismark_pe.deduplicated.sorted.txt.gz
-│   ├── CHH_context_bsseq_sample1_MappedOn_chloroplast_trim_bismark_pe.deduplicated.sorted.txt.gz
-│   ├── CHH_context_bsseq_sample2_MappedOn_chloroplast_trim_bismark_pe.deduplicated.sorted.txt
-│   ├── CHH_context_bsseq_sample2_MappedOn_chloroplast_trim_bismark_pe.deduplicated.sorted.txt.gz
-│   ├── CpG_context_bsseq_sample1_MappedOn_chloroplast_trim_bismark_pe.deduplicated.sorted.txt.gz
-│   ├── CpG_context_bsseq_sample2_MappedOn_chloroplast_trim_bismark_pe.deduplicated.sorted.txt
-│   └── CpG_context_bsseq_sample2_MappedOn_chloroplast_trim_bismark_pe.deduplicated.sorted.txt.gz
+│   ├── BSseq_Rep8a_SRR6792678_MappedOn_wheat_v1.0_incl_organelles_controls_dedup.M-bias.txt
+│   ├── BSseq_Rep8a_SRR6792678_MappedOn_wheat_v1.0_incl_organelles_controls_dedup_splitting_report.txt
+│   ├── CHG_context_BSseq_Rep8a_SRR6792678_MappedOn_wheat_v1.0_incl_organelles_controls_dedup.txt.gz
+│   ├── CHH_context_BSseq_Rep8a_SRR6792678_MappedOn_wheat_v1.0_incl_organelles_controls_dedup.txt.gz
+│   └── CpG_context_BSseq_Rep8a_SRR6792678_MappedOn_wheat_v1.0_incl_organelles_controls_dedup.txt.gz
+├── methylation_extractor_help.txt
 ├── README.md
-├── samples.csv
 ├── Snakefile
 └── trimmed
-    ├── bsseq_sample1_R1.fastq.gz_trimming_report.txt
-    ├── bsseq_sample1_R1_trim.fq.gz
-    ├── bsseq_sample1_R2.fastq.gz_trimming_report.txt
-    ├── bsseq_sample1_R2_trim.fq.gz
-    ├── bsseq_sample2_R1.fastq.gz_trimming_report.txt
-    ├── bsseq_sample2_R1_trim.fq.gz
-    ├── bsseq_sample2_R1_val_1.fq.gz
-    ├── bsseq_sample2_R2.fastq.gz_trimming_report.txt
-    ├── bsseq_sample2_R2_trim.fq.gz
-    └── bsseq_sample2_R2_val_2.fq.gz
+    ├── BSseq_Rep2a_SRR6792682_R1_trimmed.fastq.gz
+    ├── BSseq_Rep2a_SRR6792682_R2_trimmed.fastq.gz
+    ├── BSseq_Rep8a_SRR6792678_R1_trimmed.fastq.gz
+    └── BSseq_Rep8a_SRR6792678_R2_trimmed.fastq.gz
 ```
 
-# Update pipeline/environment:
+### Updating the conda environment
+
 ```
-git pull
-conda env update --file environment.yaml --name bsseq_pipeline
-```
-# Post processing
-
-Results can be imported in various software packages such as [https://github.com/al2na/methylKit](https://github.com/al2na/methylKit) using the R-snippet below. 
-Note, here all 3 context are considered seperately which can by useful for example for anyalysing plant DNA-metyhylation.
-The imported files are `*.gz.bismark.cov` from the `coverage` folder:
-
-```r
-dir_base <- "/mypath..." # set this as base path manually!
-
-meta.data <- read_csv(file.path( dir_base, "samples.csv"))
-config    <- read_yaml(file.path(dir_base, "config.yaml"))
-genome_suffix <- config$MAPPING$reference_short
-dir_files <- file.path(dir_base, "coverage")
-
-contexts <- c("CpG", "CHG", "CHH")
-for (context in contexts) {
-  fls_cov_short <- paste(meta.data$library, "_MappedOn_", genome_suffix, "_", context, ".gz.bismark.cov", sep = "")
-  fls_cov <- file.path(dir_files, fls_cov_short)
-  myobj <- methRead(as.list(fls_cov), as.list(as.character(meta.data$library)), "assembly", dbtype = NA,
-                    pipeline = "bismarkCoverage", header = FALSE, skip = 0, sep = "\t",
-                    context = context, resolution = "base",
-                    treatment = as.integer(as.factor(meta.data$condition)), dbdir = getwd(),
-                    mincov = 1)
-  # ...
-}
+conda env update --file environment.yaml --name BSseq_mapping
 ```

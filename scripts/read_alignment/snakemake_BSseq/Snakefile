@@ -5,7 +5,7 @@
 ## ***IMPORTANT***: This Snakemake pipeline should not be run with
 ## Bismark version 0.21.0 or later due to the addition of HISAT2 support,
 ## which requires Python 2, which conflicts with the Python 3 requirements
-## of other parts of this pipeline (e.g., pigz part of trim_galore rule)
+## of other parts of this pipeline (e.g., the pigz part of the trim_galore rule)
 
 # Chromosome sizes file below ("data/index/wheat_v1.0_incl_organelles_controls.fa.sizes") must exist
 # before running snakemake
@@ -15,7 +15,7 @@
 
 # Usage (snakemake --cores should reflect available cores):
 # conda env create --file environment.yaml --name BSseq_mapping
-# source activate BSseq_mapping
+# conda activate BSseq_mapping
 # snakemake -p --cores 48
 # conda deactivate
 
@@ -23,7 +23,7 @@ import pandas as pd
 import os
 
 # To make rules work with a shell script invoked using the "shell" directive,
-# we need to determine the base path of Snakefile since we expect the scripts directory to be there as well
+# we need to determine the base path of Snakefile
 SRCDIR = srcdir("")
 
 # Specify config file parameters
@@ -68,91 +68,67 @@ shell.prefix("set -euo pipefail; ")
 
 rule all:
     input:
-        ## fastqc_raw
-        #expand("logs/fastqc/raw/{sample}_{mate}_fastqc.html",
-        #       sample = sample,
-        #       mate = mate),       
-        ## trim_galore
-        #expand("trimmed/{sample}_{mate}_trimmed.fastq.gz",
-        #       sample = sample,
-        #       mate = mate),
-        ## fastqc_trimmed
-        #expand("logs/fastqc/trimmed/{sample}_{mate}_trimmed_fastqc.html",
-        #       sample = sample,
-        #       mate = mate),       
-        ## bismark
-        #expand("mapped/{sample}_MappedOn_{refbase}.bam",
-        #       sample = sample,
-        #       refbase = refbase),
-        ## deduplicate_bismark
-        #expand("mapped/dedup/{sample}_MappedOn_{refbase}_dedup.bam",
-        #       sample = sample,
-        #       refbase = refbase),
-        #expand("mapped/dedup/{sample}_MappedOn_{refbase}_dedup_sort.bam",
-        #       sample = sample,
-        #       refbase = refbase),
-        ## samtools
-        #expand("mapped/dedup/{sample}_MappedOn_{refbase}_dedup_sort.bam.{bamidx}",
-        #       sample = sample,
-        #       refbase = refbase,
-        #       bamidx = bamidx),
-        ## bamCoverage
-        #expand("mapped/dedup/{sample}_MappedOn_{refbase}_dedup_sort.bw",
-        #       sample = sample,
-        #       refbase = refbase),
-        ## methylation_extractor
-        #expand("methylation_extracted/CpG_context_{sample}_MappedOn_{refbase}_dedup.txt.gz",
-        #       sample = sample,
-        #       refbase = refbase),
-        #expand("methylation_extracted/CHG_context_{sample}_MappedOn_{refbase}_dedup.txt.gz",
-        #       sample = sample,
-        #       refbase = refbase),
-        #expand("methylation_extracted/CHH_context_{sample}_MappedOn_{refbase}_dedup.txt.gz",
-        #       sample = sample,
-        #       refbase = refbase),
-        ## bismark2bedGraph
-        #expand("coverage/{sample}_MappedOn_{refbase}_dedup_{context}",
-        #       sample = sample,
-        #       refbase = refbase,
-        #       context = context),
-        #expand("coverage/{sample}_MappedOn_{refbase}_dedup_{context}.gz.bismark.cov",
-        #       sample = sample,
-        #       refbase = refbase,
-        #       context = context),
-        ## bedGraphToBigWig
-        #expand("coverage/bw/{sample}_MappedOn_{refbase}_dedup_{context}.bw",
-        #       sample = sample,
-        #       refbase = refbase,
-        #       context = context),
+        # fastqc_raw
+        expand("logs/fastqc/raw/{sample}_{mate}_fastqc.html",
+               sample = sample,
+               mate = mate),       
+        # trim_galore
+        expand("trimmed/{sample}_{mate}_trimmed.fastq.gz",
+               sample = sample,
+               mate = mate),
+        # fastqc_trimmed
+        expand("logs/fastqc/trimmed/{sample}_{mate}_trimmed_fastqc.html",
+               sample = sample,
+               mate = mate),       
+        # bismark
+        expand("mapped/{sample}_MappedOn_{refbase}.bam",
+               sample = sample,
+               refbase = refbase),
+        # deduplicate_bismark
+        expand("mapped/dedup/{sample}_MappedOn_{refbase}_dedup.bam",
+               sample = sample,
+               refbase = refbase),
+        expand("mapped/dedup/{sample}_MappedOn_{refbase}_dedup_sort.bam",
+               sample = sample,
+               refbase = refbase),
+        # samtools
+        expand("mapped/dedup/{sample}_MappedOn_{refbase}_dedup_sort.bam.{bamidx}",
+               sample = sample,
+               refbase = refbase,
+               bamidx = bamidx),
+        # bamCoverage
+        expand("mapped/dedup/{sample}_MappedOn_{refbase}_dedup_sort.bw",
+               sample = sample,
+               refbase = refbase),
+        # methylation_extractor
+        expand("methylation_extracted/CpG_context_{sample}_MappedOn_{refbase}_dedup.txt.gz",
+               sample = sample,
+               refbase = refbase),
+        expand("methylation_extracted/CHG_context_{sample}_MappedOn_{refbase}_dedup.txt.gz",
+               sample = sample,
+               refbase = refbase),
+        expand("methylation_extracted/CHH_context_{sample}_MappedOn_{refbase}_dedup.txt.gz",
+               sample = sample,
+               refbase = refbase),
+        # bismark2bedGraph
+        expand("coverage/{sample}_MappedOn_{refbase}_dedup_{context}",
+               sample = sample,
+               refbase = refbase,
+               context = context),
+        expand("coverage/{sample}_MappedOn_{refbase}_dedup_{context}.gz.bismark.cov",
+               sample = sample,
+               refbase = refbase,
+               context = context),
+        # bedGraphToBigWig
+        expand("coverage/bw/{sample}_MappedOn_{refbase}_dedup_{context}.bw",
+               sample = sample,
+               refbase = refbase,
+               context = context),
         # coverage2cytosine
         expand("coverage/report/{sample}_MappedOn_{refbase}_dedup_{context}.CX_report.txt.gz",
                sample = sample,
                refbase = refbase,
                context = context)
-
-## this rule is suitable if only mapping is required
-## for example for mapping against lambda phage or mitochondrion to test for conversion
-## the converstion rates are reported in the log/bismark folder
-## call: snakemake map
-#rule map:
-#    input:
-#        expand("mapped/{sample}_MappedOn_" + refbase +"_trim_bismark_pe.bam", sample=SAMPLES.index),
-#
-#rule trim:
-#    input:
-#        expand("trimmed/{sample}_{mate}_trim.fq.gz", sample=SAMPLES.index, mate = mate),
-#
-#rule sort:
-#    input:
-#        expand("mapped/{sample}_MappedOn_" + refbase +"_trim_bismark_pe.deduplicated.sorted.bam", sample=SAMPLES.index),
-#
-#rule bamCoverage:
-#    input:
-#        expand("mapped/bws/{sample}_MappedOn_" + refbase +"_trim_bismark_pe.deduplicated.sorted.bw", sample=SAMPLES.index),
-#
-#rule bw:
-#    input:
-#        expand("coverage/bws/{sample}_MappedOn_" + refbase + "_{context}.bw", sample=SAMPLES.index, context=CONTEXT),
 
 # Run fastqc on R1 and R2 raw data
 rule fastqc_raw:
@@ -161,7 +137,6 @@ rule fastqc_raw:
         "data/{sample}_{mate}.fastq.gz"
     output:
         html = "logs/fastqc/raw/{sample}_{mate}_fastqc.html",
-        # The suffix _fastqc.zip is required for multiqc to find the file
         zip  = "logs/fastqc/raw/{sample}_{mate}_fastqc.zip"
     params:
         " --extract"
@@ -197,13 +172,6 @@ rule trim_galore:
         "rename 's/val_[12].fq.gz/trimmed.fastq.gz/g' trimmed/{wildcards.sample}* ; "
         "mv trimmed/{log.r1} logs/trim_galore/ ; "
         "mv trimmed/{log.r2} logs/trim_galore/"
-#        """
-#        (trim_galore --paired --cores {threads} --output_dir trimmed {params.extra} {input.r1} {input.r2} ) &> {log.se} 
-#        rename 's/val_[12].fq.gz/trimmed.fastq.gz/g' trimmed/{wildcards.sample}*
-#        mkdir --parents logs/trim_galore
-#        mv trimmed/{log.r1} logs/trim_galore/
-#        mv trimmed/{log.r2} logs/trim_galore/
-#        """
 
 # Run fastqc on R1 and R2 trimmed data
 rule fastqc_trimmed:
@@ -212,7 +180,6 @@ rule fastqc_trimmed:
         "trimmed/{sample}_{mate}_trimmed.fastq.gz"
     output:
         html = "logs/fastqc/trimmed/{sample}_{mate}_trimmed_fastqc.html",
-        # The suffix _fastqc.zip is required for multiqc to find the file
         zip  = "logs/fastqc/trimmed/{sample}_{mate}_trimmed_fastqc.zip"
     params:
         " --extract"
@@ -242,8 +209,8 @@ rule bismark:
         " --bowtie2" 
         " --multicore {threads}"
         " --nucleotide_coverage"
-        # Please note that the option -B/--basename in conjunction with --multicore is
-        # currently not supported (as in: disabled), but we are aiming to address this soon
+        # "Please note that the option -B/--basename in conjunction with --multicore is
+        # currently not supported (as in: disabled), but we are aiming to address this soon"
         # https://www.bioinformatics.babraham.ac.uk/projects/bismark/
 #        " --basename {wildcards.sample}_MappedOn_{refbase}"
 #        " --prefix {wildcards.sample}_MappedOn_{refbase}"
@@ -254,10 +221,6 @@ rule bismark:
         "mv mapped/{wildcards.sample}_R1_trimmed_bismark_bt2_pe.bam {output} ; "
         "mv mapped/{wildcards.sample}_R1_trimmed_bismark_bt2_PE_report.txt {log.rep} ; "
         "mv mapped/{wildcards.sample}_R1_trimmed_bismark_bt2_pe.nucleotide_stats.txt {log.nuc}"
-
-#mv mapped/BSseq_Rep8a_SRR6792678_R1_trimmed_bismark_bt2_pe.bam mapped/BSseq_Rep8a_SRR6792678_MappedOn_wheat_v1.0_incl_organelles_controls.bam
-#mv mapped/BSseq_Rep8a_SRR6792678_R1_trimmed_bismark_bt2_PE_report.txt logs/bismark/BSseq_Rep8a_SRR6792678_MappedOn_wheat_v1.0_incl_organelles_controls_report.txt
-#mv mapped/BSseq_Rep8a_SRR6792678_R1_trimmed_bismark_bt2_pe.nucleotide_stats.txt logs/bismark/BSseq_Rep8a_SRR6792678_MappedOn_wheat_v1.0_incl_organelles_controls.nucleotide_stats.txt
 
 # Remove duplicate alignments
 ## CHANGE NOTE: moved samtools sort to this 
