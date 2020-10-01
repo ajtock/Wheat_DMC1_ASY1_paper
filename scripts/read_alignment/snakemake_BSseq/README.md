@@ -1,27 +1,26 @@
 # snakemake\_BSseq
-Snakemake workflow for automated processing of DNA methylation data derived from whole-genome bisulfite sequencing (WGBS or BS-seq)
 
-# Automated workflow for WGBS (Illumina) and EM-Seq (NEB) data
-Supported protocols:
-- [**WGBS**](https://en.wikipedia.org/wiki/Bisulfite_sequencing)
-- [NEBNext Enzymatic Methyl-seq (**EM-seq**)](https://international.neb.com/about-neb/news-and-press-releases/new-england-biolabs-to-present-latest-innovations-for-ngs-sample-preparation-at-agbt-2017)
+## Automated workflow for whole-genome BS-seq (Illumina) and EM-Seq (NEB) data
+This is a Snakemake workflow for automated processing of DNA methylation data derived from whole-genome bisulfite sequencing (BS-seq or WGBS) or NEBNext Enzymatic Methyl-seq (EM-seq):
+- [**BS-seq**](https://en.wikipedia.org/wiki/Bisulfite_sequencing)
+- [**EM-seq**](https://international.neb.com/about-neb/news-and-press-releases/new-england-biolabs-to-present-latest-innovations-for-ngs-sample-preparation-at-agbt-2017)
 
-Both WGBS and EM-seq produce the same kind of data, so no adjustment for post-processing is needed.
+Both BS-seq and EM-seq produce the same kind of data, so no adjustment for post-processing is needed.
 
-***IMPORTANT***: This Snakemake pipeline should not be run with Bismark version 0.21.0 or later due to the addition of HISAT2 support, which requires Python 2, which conflicts with the Python 3 requirements of other parts of this pipeline (e.g., pigz part of trim\_galore rule)
+***IMPORTANT***: This Snakemake pipeline should not be run with Bismark version 0.21.0 or later due to the addition of HISAT2 support, which requires Python 2, which conflicts with the Python 3 requirements of other parts of this pipeline (e.g., the pigz part of the trim\_galore rule).
 
-# Requirements
-- demultiplexed fastq.gz files in located in `data` directory. They need to be in the form `{sample}_R1.fastq.gz`
-- `Snakefile` shipped with this repository.
-- `config.yaml` shipped with this repository. It contains all parameters and settings to customize the processing of the current dataset.
-- Optional: `environment.yaml` to create the software environment if conda is used.
+## Requirements
+- demultiplexed fastq.gz files located in `data` directory. They need to be in the form `{sample}_R1.fastq.gz`
+- `Snakefile` in this repository. This contains "rules" that each execute a step in the workflow
+- `config.yaml` in this repository. This contains customizable parameters
+- Optional: `environment.yaml`, used to create the software environment if conda is used
 - Installation of [snakemake](https://snakemake.readthedocs.io/en/stable/) and optionally [conda](https://conda.io/docs/)
-- If conda is not used, `bismark`, `bowtie2`, `fastqc`, `trim_galore`, `samtools`, `deeptools`, `ucsc-bedgraphtobigwig` and `python3` need to be in the PATH.
+- If conda is not used, `bismark`, `bowtie2`, `fastqc`, `trim_galore`, `samtools`, `deeptools`, `ucsc-bedgraphtobigwig` and `python3` need to be specified in the PATH variable
 
-The above files can be downloaded as a whole by cloning the repository (which requires git):
+The above files can be downloaded together by cloning the repository:
 
 ```
-git clone https://github.com/seb-mueller/snakemake-bisulfite
+git clone https://github.com/ajtock/Wheat_DMC1_ASY1_paper/scripts/read_alignment/snakemake_BSseq/
 ```
 Or individually (e.g., the `Snakefile`) using `wget`:
 
@@ -29,12 +28,12 @@ Or individually (e.g., the `Snakefile`) using `wget`:
 wget https://raw.githubusercontent.com/seb-mueller/snakemake_sRNAseq/master/Snakefile
 ```
 
-# Creating the conda environment
+## Creating the conda environment
 ```
 conda env create --file environment.yaml --name BSseq_mapping
 ```
 
-# Activating and deactivating the environment
+## Activating and deactivating the environment
 ```
 conda activate BSseq_mapping
 ```
@@ -43,7 +42,7 @@ conda activate BSseq_mapping
 conda deactivate
 ```
 
-# Genome preparation
+## Genome preparation
 The pipeline requires a bismark index file which might have to be created at first.
 This best done having the reference genome as fasta file located in a directory by itself (there shouldn't be any other fasta files since bismark works in mysterious ways and you can't specify a conrete file, just the directory).
 
