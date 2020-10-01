@@ -8,25 +8,20 @@ These files can be downloaded together by cloning the repository:
 git clone https://github.com/ajtock/Wheat_DMC1_ASY1_paper
 ```
 
+## Alignment workflows
+
+Workflows for processing and aligning next-generation sequencing (NGS) reads were developed using [Snakemake](https://snakemake.readthedocs.io/en/stable/) v3.13.3 in conjunction with [conda](https://conda.io/en/latest/) v4.6.9 package and environment manager. These workflows are located in `scripts/read_alignment/` in this repository.
+
 Text can be **bold**, _italic_, or ~~strikethrough~~.
 
-[Link to another page](./another-page.html).
 
-There should be whitespace between paragraphs.
-
-There should be whitespace between paragraphs. We recommend including a README, or a file with information about your project.
-
-# Header 1
-
-This is a normal paragraph following a header. GitHub is a code hosting platform for version control and collaboration. It lets you and others work together on projects from anywhere.
-
-## Header 2
+## Block quotes
 
 > This is a blockquote following a header.
 >
 > When something is important enough, you do it even if the odds are not in your favor.
 
-### Header 3
+### Code with syntax highlighting
 
 ```js
 // Javascript code with syntax highlighting.
