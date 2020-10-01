@@ -12,9 +12,9 @@ Both BS-seq and EM-seq produce the same kind of data, so no adjustment for post-
 
 ### Requirements
 
-- Installation of [snakemake](https://snakemake.readthedocs.io/en/stable/) and optionally [conda](https://conda.io/docs/)
+- Installation of [Snakemake](https://snakemake.readthedocs.io/en/stable/) and optionally [conda](https://conda.io/docs/)
 - Demultiplexed paired-end reads in gzipped FASTQ format located in the `data/` directory. These should be named according to the following naming convention: `{sample}_R1.fastq.gz` and `{sample}_R2.fastq.gz`
-- A reference genome in FASTA format (e.g., `wheat_v1.0_incl_organelles_controls.fa`) and a chromosome sizes file (e.g., `wheat_v1.0_incl_organelles_controls.fa.sizes`, generated with `samtools faidx wheat_v1.0_incl_organelles_controls.fa; cut -f1,2 wheat_v1.0_incl_organelles_controls.fa.fai > wheat_v1.0_incl_organelles_controls.fa.sizes`), both located in `data/index/`. No other FASTA format files should be located in this directory
+- A reference genome in FASTA format (e.g., `wheat_v1.0_incl_organelles_controls.fa`) and a chromosome sizes file (e.g., `wheat_v1.0_incl_organelles_controls.fa.sizes`, generated with `samtools faidx wheat_v1.0_incl_organelles_controls.fa; cut -f1,2 wheat_v1.0_incl_organelles_controls.fa.fai > wheat_v1.0_incl_organelles_controls.fa.sizes`), both located in `data/index/`. No other FASTA-format files should be located in this directory
 - A bisulfite-converted reference genome index for bowtie2, located in `data/index/` (see `data/index/bismark_genome_preparation.sh` for an example of how to generate `data/index/Bisulfite_Genome/`)
 - `Snakefile` in this repository. This contains "rules" that each execute a step in the workflow
 - `config.yaml` in this repository. This contains customizable parameters including `reference_prefix`, which should be the reference genome file name without the `.fa` extension (e.g., `wheat_v1.0_incl_organelles_controls`)
