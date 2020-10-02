@@ -159,6 +159,7 @@ Below is the directory tree structure including files generated once the Snakema
 │       └── DMC1_Rep1_ChIP_MappedOn_wheat_v1.0_lowXM_both_sort.bam.csi
 ├── scripts
 │   └── keepPaired.py
+├── README.md
 └── Snakefile
 ```
 
