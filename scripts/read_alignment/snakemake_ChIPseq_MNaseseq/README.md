@@ -42,8 +42,8 @@ In a Unix shell, navigate to the base directory containing `Snakefile`, `config.
 ├── alignment_summary.sh
 ├── config.yaml
 ├── data
-    ├── DMC1_Rep1_ChIP_R1.fastq.gz
-    ├── DMC1_Rep1_ChIP_R2.fastq.gz
+│   ├── DMC1_Rep1_ChIP_R1.fastq.gz
+│   ├── DMC1_Rep1_ChIP_R2.fastq.gz
 │   └── index
 │       ├── bowtie2_index.sh
 │       ├── samtools_faidx_chr_sizes.sh
@@ -79,3 +79,91 @@ conda deactivate
 - `--use-conda`
 - `--conda-prefix ~/.myconda`
 - `--forcerun calc_coverage` forces rerun of a given rule (e.g., `calc_coverage`)
+
+### Outputs
+
+Below is the directory tree structure including files generated once the Snakemake workflow has run to completion.
+
+```
+.
+├── alignment_summary.sh
+├── config.yaml
+├── data
+│   ├── dedup
+│   │   ├── DMC1_Rep1_ChIP_dedup_singletons.fastq.gz
+│   │   ├── DMC1_Rep1_ChIP_R1_dedup.fastq.gz
+│   │   ├── DMC1_Rep1_ChIP_R1_dedup_repair.fastq.gz
+│   │   ├── DMC1_Rep1_ChIP_R2_dedup_repair.fastq.gz
+│   │   └── trimmed
+│   ├── DMC1_Rep1_ChIP_R1.fastq.gz
+│   ├── DMC1_Rep1_ChIP_R2.fastq.gz
+│   └── index
+│       ├── wheat_v1.0.1.bt2l
+│       ├── wheat_v1.0.2.bt2l
+│       ├── wheat_v1.0.3.bt2l
+│       ├── wheat_v1.0.4.bt2l
+│       ├── wheat_v1.0.fa
+│       ├── wheat_v1.0.fa.fai
+│       ├── wheat_v1.0.fa.sizes
+│       ├── wheat_v1.0.rev.1.bt2l
+│       └── wheat_v1.0.rev.2.bt2l
+├── environment.yaml
+├── logs
+│   ├── alignment_stats
+│   │   ├── DMC1_Rep1_ChIP_alignment_summary.txt
+│   │   ├── DMC1_Rep1_ChIP_MappedOn_wheat_v1.0.bam.stats
+│   │   ├── DMC1_Rep1_ChIP_MappedOn_wheat_v1.0_lowXM_both_sort.bam.stats
+│   │   ├── DMC1_Rep1_ChIP_MappedOn_wheat_v1.0_lowXM_unique_sort.bam.stats
+│   │   ├── DMC1_Rep1_ChIP_R1_dedup_repair.fastq.gz.stats
+│   │   ├── DMC1_Rep1_ChIP_R1_dedup_repair_trimmed.fastq.gz.stats
+│   │   ├── DMC1_Rep1_ChIP_R1.fastq.gz.stats
+│   │   ├── DMC1_Rep1_ChIP_R2_dedup_repair.fastq.gz.stats
+│   │   ├── DMC1_Rep1_ChIP_R2_dedup_repair_trimmed.fastq.gz.stats
+│   │   └── DMC1_Rep1_ChIP_R2.fastq.gz.stats
+│   ├── bamCoverage
+│   │   ├── DMC1_Rep1_ChIP_MappedOn_wheat_v1.0_lowXM_both_sort_norm_binSize1Mb.log
+│   │   ├── DMC1_Rep1_ChIP_MappedOn_wheat_v1.0_lowXM_both_sort_norm.log
+│   │   ├── DMC1_Rep1_ChIP_MappedOn_wheat_v1.0_lowXM_unique_sort_norm_binSize1Mb.log
+│   │   └── DMC1_Rep1_ChIP_MappedOn_wheat_v1.0_lowXM_unique_sort_norm.log
+│   ├── bowtie2
+│   │   └── DMC1_Rep1_ChIP_MappedOn_wheat_v1.0_sort.log
+│   ├── cutadapt
+│   │   └── DMC1_Rep1_ChIP_dedup_repair_trimmed.log
+│   ├── dedup
+│   │   └── DMC1_Rep1_ChIP_R1_dedup.log
+│   ├── fastqc
+│   │   ├── raw
+│   │   └── trimmed
+│   ├── repair
+│   │   └── DMC1_Rep1_ChIP_R1_R2_dedup_repair.log
+│   └── samtools
+│       ├── DMC1_Rep1_ChIP_MappedOn_wheat_v1.0_lowXM_both_sort.log
+│       ├── DMC1_Rep1_ChIP_MappedOn_wheat_v1.0_lowXM_unique_sort.log
+│       └── stats
+├── mapped
+│   ├── both
+│   │   ├── bg
+│   │   │   ├── DMC1_Rep1_ChIP_MappedOn_wheat_v1.0_lowXM_both_sort_norm.bedgraph
+│   │   │   └── DMC1_Rep1_ChIP_MappedOn_wheat_v1.0_lowXM_both_sort_norm_binSize1Mb.bedgraph
+│   │   ├── bw
+│   │   │   └── DMC1_Rep1_ChIP_MappedOn_wheat_v1.0_lowXM_both_sort_norm.bw
+│   │   ├── DMC1_Rep1_ChIP_MappedOn_wheat_v1.0_lowXM_both_sort.bam
+│   │   └── DMC1_Rep1_ChIP_MappedOn_wheat_v1.0_lowXM_both_sort.bam.csi
+│   └── unique
+│       ├── bg
+│       │   ├── DMC1_Rep1_ChIP_MappedOn_wheat_v1.0_lowXM_both_sort_norm.bedgraph
+│       │   └── DMC1_Rep1_ChIP_MappedOn_wheat_v1.0_lowXM_both_sort_norm_binSize1Mb.bedgraph
+│       ├── bw
+│       │   └── DMC1_Rep1_ChIP_MappedOn_wheat_v1.0_lowXM_both_sort_norm.bw
+│       ├── DMC1_Rep1_ChIP_MappedOn_wheat_v1.0_lowXM_both_sort.bam
+│       └── DMC1_Rep1_ChIP_MappedOn_wheat_v1.0_lowXM_both_sort.bam.csi
+├── scripts
+│   └── keepPaired.py
+└── Snakefile
+```
+
+### Updating the conda environment
+
+```
+conda env update --file environment.yaml --name ChIPseq_mapping
+```
