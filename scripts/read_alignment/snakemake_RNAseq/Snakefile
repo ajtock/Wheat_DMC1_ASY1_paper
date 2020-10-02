@@ -1,12 +1,12 @@
-# Snakemake workflow for aligning RNA-seq libraries to a reference genome
+# Snakemake workflow for aligning paired-end RNA-seq reads to a reference genome
 
 # Chromosome sizes file below ("data/index/wheat_v1.0.fa.sizes") must exist
-# before running snakefile
+# before running snakemake
 # e.g., in "data/index/" run:
 # samtools faidx wheat_v1.0.fa; cut -f1,2 wheat_v1.0.fa.fai > wheat_v1.0.fa.sizes
 
-# Usage (snakemake --cores should reflect available cores):
-# conda env create --file environment.yaml --name RNAseq_mapping
+# Usage ("--cores" should match the "THREADS" parameter in config.yaml, and reflect available threads):
+# conda env create --file environment.yaml --name RNAseq_mapping # On first use only
 # conda activate RNAseq_mapping
 # snakemake -p --cores 48
 # conda deactivate
@@ -14,8 +14,8 @@
 import pandas as pd
 import os
 
-# To make the per_base_coverage rule work with a shell script invoked using the "shell" directive,
-# we need to determine the base path of Snakefile since we expect the scripts directory to be there as well
+# To make the samtools rule work with a shell script ("scripts/keepPaired.py") invoked using the "shell" directive,
+# we need to determine the base path of Snakefile since we expect the "scripts/" subdirectory to be located here
 SRCDIR = srcdir("")
 
 # Specify config file parameters
