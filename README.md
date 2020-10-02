@@ -10,10 +10,10 @@ git clone https://github.com/ajtock/Wheat_DMC1_ASY1_paper
 
 ## Alignment workflows
 
-Workflows for processing and aligning next-generation sequencing (NGS) reads were developed using [Snakemake](https://snakemake.readthedocs.io/en/stable/) v3.13.3 in conjunction with [conda](https://conda.io/en/latest/) v4.6.9 package and environment manager. These workflows are located in `scripts/read_alignment/` in this repository.
+Workflows for processing and aligning next-generation sequencing (NGS) reads were developed using [Snakemake](https://snakemake.readthedocs.io/en/stable/) v3.13.3 in conjunction with [conda](https://conda.io/en/latest/) v4.6.9 package and environment manager. These workflows are located in [scripts/read_alignment/](https://github.com/ajtock/Wheat_DMC1_ASY1_paper/tree/master/scripts/read_alignment) in this repository.
+
 
 Text can be **bold**, _italic_, or ~~strikethrough~~.
-
 
 ## Block quotes
 
