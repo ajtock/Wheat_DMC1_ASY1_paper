@@ -2,8 +2,8 @@
 ├── alignment_summary.sh
 ├── config.yaml
 ├── data
-    ├── DMC1_Rep1_ChIP_R1.fastq.gz
-    ├── DMC1_Rep1_ChIP_R2.fastq.gz
+│   ├── DMC1_Rep1_ChIP_R1.fastq.gz
+│   ├── DMC1_Rep1_ChIP_R2.fastq.gz
 │   └── index
 │       ├── bowtie2_index.sh
 │       ├── samtools_faidx_chr_sizes.sh
