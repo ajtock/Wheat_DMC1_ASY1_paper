@@ -8,10 +8,6 @@
 
 import os
 
-# To make the per_base_coverage rule work with a shell script invoked using the "shell" directive,
-# we need to determine the base path of Snakefile since we expect the scripts directory to be there as well
-SRCDIR = srcdir("")
-
 # Specify config file parameters
 configfile: "config.yaml"
 sample               = config["SAMPLE"]

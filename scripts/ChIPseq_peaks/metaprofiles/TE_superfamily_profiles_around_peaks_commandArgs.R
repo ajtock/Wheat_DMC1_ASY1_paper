@@ -281,9 +281,9 @@ outDFcolMeans <- lapply(seq_along(superfamName), function(x) {
               "_ranLoc_matrix_bin", winSize, "bp_flank", flankName, "_colMeans.tab"))
 })
 
-# Function to create frequency or coverage matrices for
+# Function to create TE frequency matrices for
 # feature loci and random loci (incl. flanking regions)
-# and to calculate mean levels per window
+# and to calculate mean profiles across all feature loci and random loci
 covMatrix <- function(signal,
                       feature,
                       ranLoc,

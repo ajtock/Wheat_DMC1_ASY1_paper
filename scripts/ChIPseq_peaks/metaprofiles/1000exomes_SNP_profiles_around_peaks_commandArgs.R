@@ -238,9 +238,9 @@ outDFcolMeans <- list(paste0(matDir,
                              "exome_all_SNPs_around_DMC1_peaks_in_", genomeName, "genome_", region,
                              "_ranLoc_matrix_bin", winSize, "bp_flank", flankName, "_colMeans.tab"))
 
-# Function to create frequency or coverage matrices for
+# Function to create SNP frequency matrices for
 # feature loci and random loci (incl. flanking regions)
-# and to calculate mean levels per window
+# and to calculate mean profiles across all feature loci and random loci
 covMatrix <- function(signal,
                       feature,
                       ranLoc,
