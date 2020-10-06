@@ -1,7 +1,7 @@
 #!/applications/R/R-3.5.0/bin/Rscript
 
 # Extract peaks within given wheat subgenome compartments (a.k.a. partitions); e.g., 
-# 1. R1 and R3 (distal)
+# 1. R1 and R3 (distal or "euchromatin")
 # 2. R2a and R2b (interstitial)
 # 3. C (proximal)
 # 4. heterochromatin (interstitial and proximal)
