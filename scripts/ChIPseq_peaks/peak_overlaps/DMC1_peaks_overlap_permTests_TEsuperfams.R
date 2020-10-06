@@ -93,7 +93,7 @@ if(region == "euchromatin") {
 }
 
 # Import peaks as GRanges object
-load(paste0("../../../", libNameChIP,
+load(paste0(libNameChIP,
             "_rangerPeaksGRmergedOverlaps_minuslog10_p0.001_q0.01_noMinWidth.RData"))
 peaksGR <- rangerPeaksGRmergedOverlaps
 rangerPeaksGRmergedOverlaps <- NULL
