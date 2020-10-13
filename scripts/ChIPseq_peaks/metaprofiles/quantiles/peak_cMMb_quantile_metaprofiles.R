@@ -1,7 +1,7 @@
 #!/applications/R/R-3.5.0/bin/Rscript
 
-# Calculate and plot metaprofiles of ChIP-seq signal,
-# DNA methylation proportions and SNP and transposon frequencies
+# Calculate and plot metaprofiles of ChIP-seq, MNase-seq and RNA-seq signals,
+# DNA methylation proportions, and SNP and transposon frequencies
 # (peak windowed means and 95% confidence intervals, CIs)
 # for each group of peaks, defined either by
 # decreasing recombination rate (cM/Mb) or randomly
