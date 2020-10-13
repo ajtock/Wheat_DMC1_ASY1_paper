@@ -11,7 +11,7 @@ This is a Snakemake workflow for automated processing and alignment of paired-en
 - A samtools-indexed reference genome in FASTA format and a chromosome sizes file (e.g., `wheat_v1.0.fa`, `wheat_v1.0.fa.fai`, and `wheat_v1.0.fa.sizes`, the latter two of which generated with `samtools faidx wheat_v1.0.fa; cut -f1,2 wheat_v1.0.fa.fai > wheat_v1.0.fa.sizes`), each located in `data/index/`
 - A reference genome index for bowtie2, located in `data/index/` (see `data/index/bowtie2_index.sh` for an example of how to generate this)
 - `Snakefile` in this repository. This contains "rules" that each execute a step in the workflow
-- `config.yaml` in this repository. This contains customizable parameters including `reference_prefix`, which should be the reference genome file name without the `.fa` extension (e.g., `wheat_v1.0`)
+- `config.yaml` in this repository. This contains customizable parameters including `reference`, which should be the reference genome file name without the `.fa` extension (e.g., `wheat_v1.0`)
 - Optional: `environment.yaml` in this repository, used to create the software environment if conda is used
 - If conda is not used, the tools listed in environment.yaml must be specified in the PATH variable
 
