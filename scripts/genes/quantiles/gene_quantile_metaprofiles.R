@@ -2,7 +2,7 @@
 
 # Calculate and plot metaprofiles of ChIP-seq signal,
 # DNA methylation proportions,  and SNP and transposon frequencies
-# (peak windowed means and 95% confidence intervals, CIs)
+# (gene windowed means and 95% confidence intervals, CIs)
 # for each group of genes, defined either by, for example,
 # decreasing recombination rate (cM/Mb) or randomly
 
