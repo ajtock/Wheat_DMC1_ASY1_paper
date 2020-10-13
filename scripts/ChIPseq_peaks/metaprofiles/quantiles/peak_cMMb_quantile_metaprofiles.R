@@ -225,7 +225,7 @@ ChIPDirs <- sapply(seq_along(ChIPNames), function(x) {
 })
 
 controlNames <- c(
-                  "H3_input_SRR6350669",
+                  "input_SRR6350669",
                   "MNase_Rep1"
                  )
 controlNamesDir <- c(
@@ -241,15 +241,15 @@ controlColours <- c(
                     "darkcyan"
                    )
 controlDirs <- sapply(seq_along(controlNames), function(x) {
-  if(controlNames[x] == "H3_input_SRR6350669") {
+  if(controlNames[x] == "input_SRR6350669") {
     paste0("/home/ajt200/analysis/wheat/epigenomics_shoot_leaf_IWGSC_2018_Science/",
            controlNamesDir[x], "/snakemake_ChIPseq/mapped/DMC1peakProfiles/matrices/")
   } else if(controlNames[x] == "MNase_Rep1") {
     paste0("/home/ajt200/analysis/wheat/",
            controlNamesDir[x], "/snakemake_ChIPseq/mapped/DMC1peakProfiles/matrices/")
   } else {
-    if(!(controlNames %in% c("H3_input_SRR6350669", "MNase_Rep1"))) {
-      stop(paste0("controlNames[", x, "] is neither H3_input_SRR6350669 nor MNase_Rep1"))
+    if(!(controlNames %in% c("input_SRR6350669", "MNase_Rep1"))) {
+      stop(paste0("controlNames[", x, "] is neither input_SRR6350669 nor MNase_Rep1"))
     }
   }
 })
