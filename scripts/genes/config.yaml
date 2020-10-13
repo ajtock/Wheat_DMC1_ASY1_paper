@@ -1,0 +1,19 @@
+THREADS: 32
+SAMPLE: ["DMC1_Rep1_ChIP"]
+FEATURES:
+      genomeRegionName: ["Agenome_genomewide",
+                         "Bgenome_genomewide",
+                         "Dgenome_genomewide"]
+MAPPING:
+      mode: "both"
+      reference: "data/index/wheat_v1.0"
+COVERAGE:
+      bodyLength: 3500
+      startLabel: "TSS"
+      endLabel: "TTS"
+      upstream: 2000
+      downstream: 2000
+      flankName: "2kb"
+      binSize: 20
+      binName: "20bp"
+      sortRegions: "keep"
