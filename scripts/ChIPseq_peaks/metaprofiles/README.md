@@ -1,33 +1,20 @@
 # ChIP-seq peak coverage, SNP frequency and TE frequency profiles
 
-This subdirectoy contains a Snakemake workflow for creating a matrix of coverage values at ChIP-seq peaks and in flanking regions.
+This subdirectoy contains a Snakemake workflow for creating a matrix of windowed coverage values within ChIP-seq peaks and in flanking regions.
 
-## Automated workflow for paired-end ChIP-seq and MNase-seq data processing and alignment
-
-This is a Snakemake workflow for automated processing and alignment of paired-end read data derived from chromatin immunoprecipitation or micrococcal nuclease digestion followed by high-throughput sequencing (ChIP-seq or MNase-seq).
+It also contains R scripts for creating a matrix of windowed SNP (`1000exomes_SNP_profiles_around_peaks_commandArgs.R`) or transposable element (`TE_superfamily_profiles_around_peaks_commandArgs.R`) frequency values within ChIP-seq peaks and in flanking regions.
 
 ### Requirements
 
 - Installation of [Snakemake](https://snakemake.readthedocs.io/en/stable/) and optionally [conda](https://conda.io/docs/)
-- Demultiplexed paired-end reads in gzipped FASTQ format located in the `data/` directory. These should be named according to the following naming convention: `{sample}_R1.fastq.gz` and `{sample}_R2.fastq.gz`
-- A samtools-indexed reference genome in FASTA format and a chromosome sizes file (e.g., `wheat_v1.0.fa`, `wheat_v1.0.fa.fai`, and `wheat_v1.0.fa.sizes`, the latter two of which generated with `samtools faidx wheat_v1.0.fa; cut -f1,2 wheat_v1.0.fa.fai > wheat_v1.0.fa.sizes`), each located in `data/index/`
-- A reference genome index for bowtie2, located in `data/index/` (see `data/index/bowtie2_index.sh` for an example of how to generate this)
 - `Snakefile` in this repository. This contains "rules" that each execute a step in the workflow
-- `config.yaml` in this repository. This contains customizable parameters including `reference_prefix`, which should be the reference genome file name without the `.fa` extension (e.g., `wheat_v1.0`)
-- Optional: `environment.yaml` in this repository, used to create the software environment if conda is used
-- If conda is not used, the tools listed in environment.yaml must be specified in the PATH variable
-
-This repository can be downloaded with:
-
-```
-git clone https://github.com/ajtock/Wheat_DMC1_ASY1_paper/scripts/read_alignment/snakemake_ChIPseq_MNaseseq/
-```
-
-Alternatively, individual files (e.g., `Snakefile`) can be downloaded using `wget`:
-
-```
-wget https://raw.githubusercontent.com/ajtock/Wheat_DMC1_ASY1_paper/scripts/read_alignment/snakemake_ChIPseq_MNaseseq/Snakefile
-```
+- `config.yaml` in this repository. This contains customizable parameters including `reference`, which should be the reference genome file name without the `.fa` extension (e.g., `wheat_v1.0`)
+- Optional: `environment.yaml` in [scripts/read_alignment/snakemake_ChIPseq_MNaseseq/](https://github.com/ajtock/Wheat_DMC1_ASY1_paper/tree/master/scripts/read_alignment/snakemake_ChIPseq_MNaseseq), used to create the software environment if conda is used
+- If conda is not used, the deeptools must be installed and specified in the PATH variable
+- Peak coordinates and, separately, random locus coordinates in BED6 format: column 1 = chromosome ID; column 2 = 0-based start coordinate; column 3 = 1-based end coordinates; column 4 = sequential or otherwise unique numbers (this will speed up computation; see comment from dpryan79 on 13/09/2018 under GitHub issue [computeMatrix has problem with multi processors #760](https://github.com/deeptools/deepTools/issues/760)]); column 5 = fill with NA; column 6 = fill with \*
+- A bigWig coverage file (generated using deepTools bamCoverage as part of the [snakemake_ChIPseq_MNaseseq/](https://github.com/ajtock/Wheat_DMC1_ASY1_paper/tree/master/scripts/read_alignment/snakemake_ChIPseq_MNaseseq) pipeline), to be used for calculating coverage profiles around peaks and random loci (e.g., DMC1_Rep1_ChIP_MappedOn_wheat_v1.0_lowXM_both_sort_norm.bw)
+- Variant call format (VCF) file containing ~3 million exome sequencing-derived SNP sites ([all.GP08_mm75_het3_publication01142019.vcf](http://wheatgenomics.plantpath.ksu.edu/1000EC/)), from [He et al. (2019) *Nat. Genet.* **51**. DOI: 10.1038/s41588-019-0382-2](doi.org/10.1038/s41588-019-0382-2)
+- Transposable elements (TEs) from the [IWGSC RefSeq v1.0 annotation](https://urgi.versailles.inra.fr/download/iwgsc/IWGSC_RefSeq_Annotations/v1.0/), with genomic coordinates for elements in each of 14 superfamilies in BED6 format (including strand information; one BED6-format file for each TE superfamily and for each set of randomly positioned loci)
 
 ### Creating the conda environment
 
@@ -37,34 +24,7 @@ conda env create --file environment.yaml --name ChIPseq_mapping
 
 ### Usage
 
-In a Unix shell, navigate to the base directory containing `Snakefile`, `config.yaml`, `environment.yaml`, and the `data\` subdirectory, which should have a directory tree structure like this:
-
-```
-.
-├── alignment_summary.sh
-├── config.yaml
-├── data
-│   ├── DMC1_Rep1_ChIP_R1.fastq.gz
-│   ├── DMC1_Rep1_ChIP_R2.fastq.gz
-│   └── index
-│       ├── bowtie2_index.sh
-│       ├── samtools_faidx_chr_sizes.sh
-│       ├── wheat_v1.0.1.bt2l
-│       ├── wheat_v1.0.2.bt2l
-│       ├── wheat_v1.0.3.bt2l
-│       ├── wheat_v1.0.4.bt2l
-│       ├── wheat_v1.0.fa
-│       ├── wheat_v1.0.fa.fai
-│       ├── wheat_v1.0.fa.sizes
-│       ├── wheat_v1.0.rev.1.bt2l
-│       └── wheat_v1.0.rev.2.bt2l
-├── environment.yaml
-├── README.md
-├── scripts
-│   └── keepPaired.py
-└── Snakefile
-```
-
+In a Unix shell, navigate to the base directory containing `Snakefile` and  `config.yaml`.
 Then run the following commands in the base directory (`--cores` should match the `THREADS` parameter in `config.yaml`):
 
 ```
@@ -81,89 +41,6 @@ conda deactivate
 - `--use-conda`
 - `--conda-prefix ~/.myconda`
 - `--forcerun calc_coverage` forces rerun of a given rule (e.g., `calc_coverage`)
-
-### Outputs
-
-Below is the directory tree structure including files generated once the Snakemake workflow has run to completion.
-
-```
-.
-├── alignment_summary.sh
-├── config.yaml
-├── data
-│   ├── dedup
-│   │   ├── DMC1_Rep1_ChIP_dedup_singletons.fastq.gz
-│   │   ├── DMC1_Rep1_ChIP_R1_dedup.fastq.gz
-│   │   ├── DMC1_Rep1_ChIP_R1_dedup_repair.fastq.gz
-│   │   ├── DMC1_Rep1_ChIP_R2_dedup_repair.fastq.gz
-│   │   └── trimmed
-│   ├── DMC1_Rep1_ChIP_R1.fastq.gz
-│   ├── DMC1_Rep1_ChIP_R2.fastq.gz
-│   └── index
-│       ├── wheat_v1.0.1.bt2l
-│       ├── wheat_v1.0.2.bt2l
-│       ├── wheat_v1.0.3.bt2l
-│       ├── wheat_v1.0.4.bt2l
-│       ├── wheat_v1.0.fa
-│       ├── wheat_v1.0.fa.fai
-│       ├── wheat_v1.0.fa.sizes
-│       ├── wheat_v1.0.rev.1.bt2l
-│       └── wheat_v1.0.rev.2.bt2l
-├── environment.yaml
-├── logs
-│   ├── alignment_stats
-│   │   ├── DMC1_Rep1_ChIP_alignment_summary.txt
-│   │   ├── DMC1_Rep1_ChIP_MappedOn_wheat_v1.0.bam.stats
-│   │   ├── DMC1_Rep1_ChIP_MappedOn_wheat_v1.0_lowXM_both_sort.bam.stats
-│   │   ├── DMC1_Rep1_ChIP_MappedOn_wheat_v1.0_lowXM_unique_sort.bam.stats
-│   │   ├── DMC1_Rep1_ChIP_R1_dedup_repair.fastq.gz.stats
-│   │   ├── DMC1_Rep1_ChIP_R1_dedup_repair_trimmed.fastq.gz.stats
-│   │   ├── DMC1_Rep1_ChIP_R1.fastq.gz.stats
-│   │   ├── DMC1_Rep1_ChIP_R2_dedup_repair.fastq.gz.stats
-│   │   ├── DMC1_Rep1_ChIP_R2_dedup_repair_trimmed.fastq.gz.stats
-│   │   └── DMC1_Rep1_ChIP_R2.fastq.gz.stats
-│   ├── bamCoverage
-│   │   ├── DMC1_Rep1_ChIP_MappedOn_wheat_v1.0_lowXM_both_sort_norm_binSize1Mb.log
-│   │   ├── DMC1_Rep1_ChIP_MappedOn_wheat_v1.0_lowXM_both_sort_norm.log
-│   │   ├── DMC1_Rep1_ChIP_MappedOn_wheat_v1.0_lowXM_unique_sort_norm_binSize1Mb.log
-│   │   └── DMC1_Rep1_ChIP_MappedOn_wheat_v1.0_lowXM_unique_sort_norm.log
-│   ├── bowtie2
-│   │   └── DMC1_Rep1_ChIP_MappedOn_wheat_v1.0_sort.log
-│   ├── cutadapt
-│   │   └── DMC1_Rep1_ChIP_dedup_repair_trimmed.log
-│   ├── dedup
-│   │   └── DMC1_Rep1_ChIP_R1_dedup.log
-│   ├── fastqc
-│   │   ├── raw
-│   │   └── trimmed
-│   ├── repair
-│   │   └── DMC1_Rep1_ChIP_R1_R2_dedup_repair.log
-│   └── samtools
-│       ├── DMC1_Rep1_ChIP_MappedOn_wheat_v1.0_lowXM_both_sort.log
-│       ├── DMC1_Rep1_ChIP_MappedOn_wheat_v1.0_lowXM_unique_sort.log
-│       └── stats
-├── mapped
-│   ├── both
-│   │   ├── bg
-│   │   │   ├── DMC1_Rep1_ChIP_MappedOn_wheat_v1.0_lowXM_both_sort_norm.bedgraph
-│   │   │   └── DMC1_Rep1_ChIP_MappedOn_wheat_v1.0_lowXM_both_sort_norm_binSize1Mb.bedgraph
-│   │   ├── bw
-│   │   │   └── DMC1_Rep1_ChIP_MappedOn_wheat_v1.0_lowXM_both_sort_norm.bw
-│   │   ├── DMC1_Rep1_ChIP_MappedOn_wheat_v1.0_lowXM_both_sort.bam
-│   │   └── DMC1_Rep1_ChIP_MappedOn_wheat_v1.0_lowXM_both_sort.bam.csi
-│   └── unique
-│       ├── bg
-│       │   ├── DMC1_Rep1_ChIP_MappedOn_wheat_v1.0_lowXM_both_sort_norm.bedgraph
-│       │   └── DMC1_Rep1_ChIP_MappedOn_wheat_v1.0_lowXM_both_sort_norm_binSize1Mb.bedgraph
-│       ├── bw
-│       │   └── DMC1_Rep1_ChIP_MappedOn_wheat_v1.0_lowXM_both_sort_norm.bw
-│       ├── DMC1_Rep1_ChIP_MappedOn_wheat_v1.0_lowXM_both_sort.bam
-│       └── DMC1_Rep1_ChIP_MappedOn_wheat_v1.0_lowXM_both_sort.bam.csi
-├── scripts
-│   └── keepPaired.py
-├── README.md
-└── Snakefile
-```
 
 ### Updating the conda environment
 

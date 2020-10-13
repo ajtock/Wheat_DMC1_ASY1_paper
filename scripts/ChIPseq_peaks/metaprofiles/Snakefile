@@ -1,4 +1,4 @@
-# Snakemake workflow for creating a matrix of
+# Snakemake workflow for creating a matrix of windowed
 # coverage values for genomic features and flanking regions 
 
 # Usage ("--cores" should match the "THREADS" parameter in config.yaml, and reflect available threads):
