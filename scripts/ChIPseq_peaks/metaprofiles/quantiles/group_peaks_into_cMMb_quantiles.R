@@ -4,7 +4,7 @@
 # 100th--75th (Quantile 1), 75th--50th (Quantile 2),
 # 50th--25th (Quantile 3) and 25th--0th (Quantile 4) percentiles
 # with regard to their mean crossover recombination rate (cM/Mb) values,
-# derived from a Chinese Spring x Renan genetic map.
+# derived from a Chinese Spring × Renan genetic map.
 #
 # This script extends ChIP-seq peak boundaries by 1 kb on each side,
 # and computes mean cM/Mb values within these intervals using previously
