@@ -12,7 +12,7 @@ This is a Snakemake workflow for automated processing and alignment of paired-en
 - Gene annotations in GTF format (e.g., `IWGSC_v1.1_HC_20170706.gtf`) and a reference genome index with exon and splice site annotations for hisat2, each located in `data/index/` (see `data/index/hisat2_genome_index.sh` for an example of how to generate these)
 - Lists of potential contaminant sequences to be removed, located in `contaminants/`, provided or described in this repository
 - `Snakefile` in this repository. This contains "rules" that each execute a step in the workflow
-- `config.yaml` in this repository. This contains customizable parameters including `reference_prefix`, which should be the reference genome file name without the `.fa` extension (e.g., `wheat_v1.0`)
+- `config.yaml` in this repository. This contains customizable parameters including `reference`, which should be the reference genome file name without the `.fa` extension (e.g., `wheat_v1.0`)
 - Optional: `environment.yaml` in this repository, used to create the software environment if conda is used
 - If conda is not used, the tools listed in environment.yaml must be specified in the PATH variable
 
