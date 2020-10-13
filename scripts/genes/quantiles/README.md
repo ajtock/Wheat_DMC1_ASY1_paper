@@ -6,6 +6,6 @@ This script extends gene boundaries by 1 kb on each side, and computes mean cM/M
 To compute population genetics statistics for each gene, this script also requires a variant call format (VCF) file containing ~3 million exome sequencing-derived SNP sites ([all.GP08_mm75_het3_publication01142019.vcf.gz](http://wheatgenomics.plantpath.ksu.edu/1000EC/)), with geographical information about each accession obtained from [He et al. (2019) *Nat. Genet.* **51**. DOI: 10.1038/s41588-019-0382-2](https://www.nature.com/articles/s41588-019-0382-2).
 
 
-`gene_quantile_metaprofiles.R` calculates and plots metaprofiles of ChIP-seq signal, DNA methylation proportions and SNP and transposon frequencies (gene windowed means and 95% confidence intervals, CIs) for each group of genes, defined either by, for example,  decreasing recombination rate or randomly.
+`gene_quantile_metaprofiles.R` calculates and plots metaprofiles of ChIP-seq, MNase-seq and RNA-seq signals, DNA methylation proportions, and SNP and transposon frequencies (gene windowed means and 95% confidence intervals, CIs) for each group of genes, defined either by decreasing recombination rate, for example, or randomly.
 
 `peak_cMMb_quantile_cMMb_density_mean_95CI_plot.R` plots density and means with 95% CIs of recombination rate for each group of peaks.
