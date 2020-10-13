@@ -6,4 +6,4 @@ This script extends ChIP-seq peak boundaries by 1 kb on each side, and computes 
 
 `peak_cMMb_quantile_metaprofiles.R` calculates and plots metaprofiles of ChIP-seq signal and SNP and transposon frequencies (peak windowed means and 95% confidence intervals, CIs) for each group of peaks, defined either by decreasing recombination rate or randomly.
 
-`peak_cMMb_quantile_cMMb_density_mean_95CI_plot.R` plots density and means with 95% confidence intervals (CIs) of recombination rate for each group of peaks.
+`peak_cMMb_quantile_cMMb_density_mean_95CI_plot.R` plots density and means with 95% CIs of recombination rate for each group of peaks.
