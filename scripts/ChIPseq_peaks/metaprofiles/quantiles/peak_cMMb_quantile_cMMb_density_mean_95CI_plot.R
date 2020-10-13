@@ -65,8 +65,6 @@ makeTransparent <- function(thisColour, alpha = 250)
 quantileColours <- makeTransparent(quantileColours)
 
 # Genomic definitions
-#chrs <- as.vector(read.table("/home/ajt200/analysis/wheat/sRNAseq_meiocyte_Martin_Moore/snakemake_sRNAseq/data/index/wheat_v1.0.fa.sizes")[,1])
-#chrs <- chrs[-length(chrs)]
 chrs <- paste0(rep("chr", 21), rep(1:7, 3),
                c(rep("A", 7), rep("B", 7), rep("D", 7)))
 

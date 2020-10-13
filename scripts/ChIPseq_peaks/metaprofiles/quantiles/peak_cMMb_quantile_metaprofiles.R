@@ -81,7 +81,7 @@ featureStartLab <- "Start"
 featureEndLab <- "End"
 
 # Genomic definitions
-chrs <- as.vector(read.table("/home/ajt200/analysis/wheat/sRNAseq_meiocyte_Martin_Moore/snakemake_sRNAseq/data/index/wheat_v1.0.fa.sizes")[,1])
+chrs <- as.vector(read.table("wheat_v1.0.fa.sizes")[,1])
 chrs <- chrs[-length(chrs)]
 
 # Load table of features grouped into quantiles
