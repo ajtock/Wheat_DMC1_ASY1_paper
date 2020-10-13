@@ -1,4 +1,4 @@
-# ChIP-seq peak recombination rate (cM/Mb) quantiles
+# Gene quantiles
 
 This subdirectory contains the R script `group_genes_into_quantiles_and_popgenetics.R` for dividing genes into groups corresponding to those in given percentile ranges (e.g., the 100th--75th (Quantile 1), 75th--50th (Quantile 2), 50th--25th (Quantile 3) and 25th--0th (Quantile 4)) with regard to various ordering factors, such as mean crossover recombination rate (cM/Mb) values, derived from a Chinese Spring × Renan genetic map, ChIP-seq signal, or population genetics statistics.
 This script extends gene boundaries by 1 kb on each side, and computes mean cM/Mb values within these intervals using previously calculated mean recombination rates in 10-Mb sliding windows with a 1-Mb step (`iwgsc_refseqv1.0_recombination_rate.txt`, available as part of the [IWGSC RefSeq v1.0 annotation](https://urgi.versailles.inra.fr/download/iwgsc/IWGSC_RefSeq_Annotations/v1.0/)).
