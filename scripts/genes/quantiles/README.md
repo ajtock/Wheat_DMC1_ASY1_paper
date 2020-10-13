@@ -8,4 +8,4 @@ To compute population genetics statistics for each gene, this script also requir
 
 `gene_quantile_metaprofiles.R` calculates and plots metaprofiles of ChIP-seq, MNase-seq and RNA-seq signals, DNA methylation proportions, and SNP and transposon frequencies (gene windowed means and 95% confidence intervals, CIs) for each group of genes, defined either by decreasing recombination rate, for example, or randomly.
 
-`peak_cMMb_quantile_cMMb_density_mean_95CI_plot.R` plots density and means with 95% CIs of recombination rate for each group of peaks.
+`gene_quantile_cMMb_density_mean_95CI_plot.R` plots density and means with 95% CIs of recombination rate for each group of genes.
