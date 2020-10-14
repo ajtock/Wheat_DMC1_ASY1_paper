@@ -55,7 +55,6 @@ featureNamePlot <- paste0(sub("_\\w+", "", libName), " ",
 ranFeatNamePlot <- paste0("Random ",
                           substr(featureName[1], start = 1, stop = 4),
                           " quantiles")
-#ranLocNamePlot <- "Random locus quantiles"
 
 # Define quantile colours
 quantileColours <- c("red", "purple", "blue", "navy")
@@ -92,15 +91,6 @@ featuresDF <- read.table(paste0(outDir, "features_", quantiles, "quantiles",
                                 substring(featureName[1][1], first = 18), ".txt"),
                          header = T, sep = "\t")
 }
-## Load table of ranLocs grouped according to feature quantiles
-#ranLocsDF <- read.table(paste0(outDir, "features_", quantiles, "quantiles",
-#                               "_by_log2_", libName, "_control_in_",
-#                               region, "_of_",
-#                               substring(featureName[1][1], first = 1, last = 5), "_in_",
-#                               paste0(substring(featureName, first = 10, last = 16),
-#                                      collapse = "_"), "_",
-#                               substring(featureName[1][1], first = 18), "_ranLocs.txt"),
-#                        header = T, sep = "\t")
 
 # Load features to confirm feature (row) ordering in "featuresDF" is the same
 # as in "features" (which was used for generating the coverage matrices)
@@ -237,19 +227,14 @@ featuresDF <- featuresDF[which(featuresDF$cMMb <=
 ranFeatsDF <- ranFeatsDF[which(ranFeatsDF$cMMb <=
                                quantile(ranFeatsDF$cMMb,
                                         probs = 0.99, na.rm = T)),]
-#ranLocsDF <- ranFeatsDF[which(ranLocsDF$cMMb <=
-#                               quantile(ranLocsDF$cMMb,
-#                                        probs = 0.99, na.rm = T)),]
 
 xmin <- min(c(
               featuresDF[unlist(quantileIndices),]$cMMb,
               featuresDF[unlist(randomPCIndices),]$cMMb
-#              ranLocsDF[unlist(quantileIndices),]$cMMb
              ), na.rm = T)
 xmax <- max(c(
               featuresDF[unlist(quantileIndices),]$cMMb,
               featuresDF[unlist(randomPCIndices),]$cMMb
-#              ranLocsDF[unlist(quantileIndices),]$cMMb
              ), na.rm = T)
 minDensity <- 0
 maxDensity <- max(density(featuresDF[featuresDF$quantile == "Quantile 4",]$cMMb,
@@ -257,8 +242,6 @@ maxDensity <- max(density(featuresDF[featuresDF$quantile == "Quantile 4",]$cMMb,
 maxDensity <- max(
   c(
     sapply(1:quantiles, function(k) {
-#      max(c(max(density(ranLocsDF[ranLocsDF$random == paste0("Random ", k),]$cMMb,
-#                        na.rm = T)$y),
       max(c(max(density(featuresDF[featuresDF$quantile == paste0("Quantile ", k),]$cMMb,
                         na.rm = T)$y),
             max(density(ranFeatsDF[ranFeatsDF$random == paste0("Random ", k),]$cMMb,
@@ -313,11 +296,6 @@ cMMb_plotFun <- function(lociDF,
         axis.text.x = element_text(size = 18, colour = "black", family = "Luxi Mono"),
         axis.title = element_text(size = 26, colour = "black"),
         legend.position = "none",
-##       TEST WITH THIS WAY OF PLOTTING LEGEND LABELS TO CHECK THAT QUANTILES CORRESPOND TO EXPECTED COLOURS
-#        legend.position = c(0.8, 0.8),
-#        legend.text = element_text(size = 22, colour = "black"),
-#        legend.key.size = unit(1, "cm"),
-#        legend.title = element_blank(),
         panel.grid = element_blank(),
         panel.border = element_blank(),
         panel.background = element_blank(),
@@ -344,8 +322,6 @@ cMMb_meanCIs <- function(dataFrame,
   scale_colour_manual(values = quantileColours) +
   scale_y_continuous(limits = c(summary_stats_min, summary_stats_max),
                      labels = function(x) sprintf("%1.2f", x)) +
-#  scale_x_discrete(breaks = as.vector(dataFrame$quantile),
-#                   labels = as.vector(dataFrame$quantile)) +
   labs(x = "",
        y = parameterLab) +
   theme_bw() +
@@ -405,7 +381,7 @@ ggsave(paste0(plotDir,
               substring(featureName[1][1], first = 1, last = 5), "_in_",
               paste0(substring(featureName, first = 10, last = 16),
                      collapse = "_"), "_",
-              substring(featureName[1][1], first = 18), "_v080620.pdf"),
+              substring(featureName[1][1], first = 18), ".pdf"),
        plot = ggObjGA_combined,
        height = 13, width = 14)
 } else {
@@ -415,7 +391,7 @@ ggsave(paste0(plotDir,
               substring(featureName[1][1], first = 1, last = 5), "_in_",
               paste0(substring(featureName, first = 10, last = 16),
                      collapse = "_"), "_",
-              substring(featureName[1][1], first = 18), "_v080620.pdf"),
+              substring(featureName[1][1], first = 18), ".pdf"),
        plot = ggObjGA_combined,
        height = 13, width = 14)
 }
