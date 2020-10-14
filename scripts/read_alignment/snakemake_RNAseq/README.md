@@ -1,6 +1,4 @@
-# snakemake\_RNAseq
-
-## Automated workflow for paired-end RNA-seq data processing and alignment
+# Automated workflow for paired-end RNA-seq data processing and alignment
 
 This is a Snakemake workflow for automated processing and alignment of paired-end RNA-seq data.
 
