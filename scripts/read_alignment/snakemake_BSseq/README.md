@@ -1,6 +1,4 @@
-# snakemake\_BSseq
-
-## Automated workflow for whole-genome BS-seq (Illumina) and EM-Seq (NEB) data
+# Automated workflow for whole-genome BS-seq (Illumina) and EM-Seq (NEB) data
 
 This is a Snakemake workflow for automated processing of DNA methylation data derived from whole-genome bisulfite sequencing (BS-seq or WGBS) or NEBNext Enzymatic Methyl-seq (EM-seq):
 - [**BS-seq**](https://en.wikipedia.org/wiki/Bisulfite_sequencing)
