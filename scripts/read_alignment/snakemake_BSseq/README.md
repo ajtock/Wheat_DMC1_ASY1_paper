@@ -19,18 +19,6 @@ Both BS-seq and EM-seq produce the same kind of data, so no adjustment for post-
 - Optional: `environment.yaml` in this repository, used to create the software environment if conda is used
 - If conda is not used, `bismark`, `bowtie2`, `fastqc`, `trim_galore`, `samtools`, `deeptools`, `ucsc-bedgraphtobigwig` and `python3` must be specified in the PATH variable
 
-This repository can be downloaded with:
-
-```
-git clone https://github.com/ajtock/Wheat_DMC1_ASY1_paper/scripts/read_alignment/snakemake_BSseq/
-```
-
-Alternatively, individual files (e.g., `Snakefile`) can be downloaded using `wget`:
-
-```
-wget https://raw.githubusercontent.com/ajtock/Wheat_DMC1_ASY1_paper/scripts/read_alignment/snakemake_BSseq/Snakefile
-```
-
 ### Creating the conda environment
 
 ```
