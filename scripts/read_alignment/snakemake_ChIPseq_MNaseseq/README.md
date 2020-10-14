@@ -8,7 +8,7 @@ This is a Snakemake workflow for automated processing and alignment of paired-en
 
 - Installation of [Snakemake](https://snakemake.readthedocs.io/en/stable/) and optionally [conda](https://conda.io/docs/)
 - Demultiplexed paired-end reads in gzipped FASTQ format located in the `data/` directory. These should be named according to the following naming convention: `{sample}_R1.fastq.gz` and `{sample}_R2.fastq.gz`
-- A samtools-indexed reference genome in FASTA format and a chromosome sizes file (e.g., `wheat_v1.0.fa`, `wheat_v1.0.fa.fai`, and `wheat_v1.0.fa.sizes`, the latter two of which generated with `samtools faidx wheat_v1.0.fa; cut -f1,2 wheat_v1.0.fa.fai > wheat_v1.0.fa.sizes`), each located in `data/index/`
+- A samtools-indexed reference genome in FASTA format and a chromosome sizes file (e.g., `wheat_v1.0.fa`, `wheat_v1.0.fa.fai`, and `wheat_v1.0.fa.sizes`, the latter two of which generated with `samtools faidx wheat_v1.0.fa; cut -f1,2 wheat_v1.0.fa.fai > wheat_v1.0.fa.sizes`), each located in `data/index/`. The [IWGSC RefSeq v1.0 Chinese Spring genome assembly](https://urgi.versailles.inra.fr/download/iwgsc/IWGSC_RefSeq_Assemblies/v1.0/) was used in this case
 - A reference genome index for bowtie2, located in `data/index/` (see `data/index/bowtie2_index.sh` for an example of how to generate this)
 - `Snakefile` in this repository. This contains "rules" that each execute a step in the workflow
 - `config.yaml` in this repository. This contains customizable parameters including `reference`, which should be the reference genome file name without the `.fa` extension (e.g., `wheat_v1.0`)
