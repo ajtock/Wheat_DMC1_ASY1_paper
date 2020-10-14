@@ -1,8 +1,8 @@
 # Gene quantiles
 
-This subdirectory contains the R script `group_NLR_genes_into_quantiles.R` for dividing NLR-encoding genes into groups corresponding to those in given percentile ranges (e.g., 100th–75th (Quantile 1), 75th–50th (Quantile 2), 50th–25th (Quantile 3) and 25th–0th (Quantile 4)) with regard to various ordering factors, such as mean crossover recombination rate (cM/Mb) values, derived from a Chinese Spring × Renan genetic map, ChIP-seq signal, or physical cluster size.
+This subdirectory contains the R script `group_NLR_genes_into_quantiles.R` for dividing NLR-encoding genes into groups corresponding to those in given percentile ranges (e.g., 100th–75th (Quantile 1), 75th–50th (Quantile 2), 50th–25th (Quantile 3) and 25th–0th (Quantile 4)) with regard to different ordering factors, such as mean crossover recombination rate (cM/Mb) values, derived from a Chinese Spring × Renan genetic map, ChIP-seq signal, or physical cluster size.
 
-`metaprofiles/gene_quantile_metaprofiles.R` calculates and plots metaprofiles of ChIP-seq, MNase-seq and RNA-seq signals, DNA methylation proportions, and SNP and transposon frequencies (gene windowed means and 95% confidence intervals, CIs) for each group of genes, defined either by decreasing recombination rate, for example, or randomly.
+`metaprofiles/gene_quantile_metaprofiles.R` calculates and plots metaprofiles of ChIP-seq, MNase-seq and RNA-seq signals, DNA methylation proportions, and SNP and transposon frequencies (gene windowed means and 95% confidence intervals, CIs) for each group of NLR genes, defined either by decreasing recombination rate, for example, or randomly.
 
 `stat_means_95CIs/gene_quantile_cMMb_density_mean_95CI_plot.R` plots density and means with 95% CIs of recombination rate for each group of genes.
 

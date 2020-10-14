@@ -36,6 +36,15 @@ chrs <- as.vector(read.table("wheat_v1.0.fa.sizes")[,1])
 chrs <- chrs[-length(chrs)]
 
 # Load table of NLRs including NLRAnnotator-generated motif annotation
+# Largest ("repres") set of motifs for each NLR
+NLR_repres_motifs <- read.table(paste0("/home/ajt200/analysis/wheat/annotation/221118_download/iwgsc_refseqv1.1_gen
+es_2017July06/",
+                                       "NLRs_Steuernagel_Wulff_2020_Plant_Physiol/NLRAnnotator/",
+                                       "NLRAnnotator_genes_repres_mRNA_repres_motifs.bed"),
+                                header = F, stringsAsFactors = F)
+colnames(NLR_repres_motifs) <- c("chr", "start0based", "end", "featureID", "motifs", "strand")
+NLR_repres_motifs <- NLR_repres_motifs[NLR_repres_motifs$chr != "chrUn",]
+# Concatenated ("concat") sets of motifs for each NLR
 NLR_concat_motifs <- read.table(paste0("/home/ajt200/analysis/wheat/annotation/221118_download/iwgsc_refseqv1.1_genes_2017July06/",
                                        "NLRs_Steuernagel_Wulff_2020_Plant_Physiol/NLRAnnotator/",
                                        "NLRAnnotator_genes_repres_mRNA_concat_motifs.bed"),
