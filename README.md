@@ -5,7 +5,13 @@ This repository contains custom scripts used in the preparation of the paper ent
 These files can be downloaded together by cloning the repository:
 
 ```
-git clone https://github.com/ajtock/Wheat_DMC1_ASY1_paper
+git clone https://github.com/ajtock/Wheat_DMC1_ASY1_paper/
+```
+
+Alternatively, individual files (e.g., `Snakefile`) can be downloaded using `wget`:
+
+```
+wget https://raw.githubusercontent.com/ajtock/Wheat_DMC1_ASY1_paper/scripts/read_alignment/snakemake_ChIPseq_MNaseseq/Snakefile
 ```
 
 ## Alignment workflows
