@@ -13,18 +13,6 @@ This is a Snakemake workflow for automated processing and alignment of paired-en
 - Optional: `environment.yaml` in this repository, used to create the software environment if conda is used
 - If conda is not used, the tools listed in environment.yaml must be specified in the PATH variable
 
-This repository can be downloaded with:
-
-```
-git clone https://github.com/ajtock/Wheat_DMC1_ASY1_paper/scripts/read_alignment/snakemake_ChIPseq_MNaseseq/
-```
-
-Alternatively, individual files (e.g., `Snakefile`) can be downloaded using `wget`:
-
-```
-wget https://raw.githubusercontent.com/ajtock/Wheat_DMC1_ASY1_paper/scripts/read_alignment/snakemake_ChIPseq_MNaseseq/Snakefile
-```
-
 ### Creating the conda environment
 
 ```
