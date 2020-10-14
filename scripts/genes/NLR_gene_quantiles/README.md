@@ -6,5 +6,5 @@ This subdirectory contains the R script `group_NLR_genes_into_quantiles.R` for d
 
 `stat_means_95CIs/NLR_gene_quantile_cMMb_density_mean_95CI_plot.R` and `stat_means_95CIs/NLR_gene_quantile_cluster_size_density_mean_95CI_plot.R` plot density and means with 95% CIs of recombination rate and physical cluster size, respectively, for each group of NLR genes. 
 
-`hypergeometric_tests/proportion_*_in_NLR_quantiles_hypergeometricTest.R` scripts evaluate different NLR gene categories for over- and under-representation in each group of NLR genes by applying hypergeometric tests.
+`hypergeometric_tests/*proportion_*_in_NLR_quantiles_hypergeometricTest.R` scripts evaluate different NLR gene categories for over- and under-representation in each group of NLR genes by applying hypergeometric tests.
 These scripts also sample from the hypergeometric distribution 100,000 times to obtain a probability distribution for plotting the log<sub>2</sub>(observed/expected) ratio and significance threshold.
