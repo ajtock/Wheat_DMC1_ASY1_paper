@@ -188,7 +188,6 @@ lapply(seq_along(1:quantiles), function(k) {
 ChIPNames <- c(
                "ASY1_CS_Rep1_ChIP",
                "DMC1_Rep1_ChIP",
-               "H2AZ_Rep1_ChIP",
                "H3K4me3_Rep1_ChIP",
                "H3K4me1_Rep1_ChIP_SRR8126618",
                "H3K27ac_Rep1_ChIP_SRR8126621",
@@ -199,7 +198,6 @@ ChIPNames <- c(
 ChIPNamesDir <- c(
                   "ASY1_CS",
                   "DMC1",
-                  "H2AZ",
                   "H3K4me3",
                   "H3K4me1",
                   "H3K27ac",
@@ -210,7 +208,6 @@ ChIPNamesDir <- c(
 log2ChIPNamesPlot <- c(
                        "ASY1",
                        "DMC1",
-                       "H2A.Z",
                        "H3K4me3",
                        "H3K4me1",
                        "H3K27ac",
