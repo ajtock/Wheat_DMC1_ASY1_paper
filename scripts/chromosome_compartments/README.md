@@ -1,3 +1,0 @@
-# Hexaploid wheat chromosome compartments
-
-We used previously defined coordinates delimiting distal (R1 and R3), interstitial (R2a and R2b), proximal (C) and centromeric regions of the [IWGSC RefSeq v1.0 assembled chromosomes](https://urgi.versailles.inra.fr/download/iwgsc/IWGSC_RefSeq_Assemblies/v1.0/) of hexaploid wheat landrace Chinese Spring, as specified in [Tables S11 and S29](https://science.sciencemag.org/content/suppl/2018/08/15/361.6403.eaar7191.DC1) of [Appels et al. (2018) *Science* **361**. DOI: 10.1126/science.aar7191](https://science.sciencemag.org/content/361/6403/eaar7191).
