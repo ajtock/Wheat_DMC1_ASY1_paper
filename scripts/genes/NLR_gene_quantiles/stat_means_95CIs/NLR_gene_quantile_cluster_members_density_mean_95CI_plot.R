@@ -1,0 +1,394 @@
+#!/applications/R/R-3.5.0/bin/Rscript
+
+# Plot density and means with 95% confidence intervals (CIs)
+# of physical cluster size for each group of NLR genes
+
+# Usage:
+# /applications/R/R-3.5.0/bin/Rscript NLR_gene_quantile_cluster_members_density_mean_95CI_plot.R cluster_members 'NLR_genes_in_Agenome_genomewide,NLR_genes_in_Bgenome_genomewide,NLR_genes_in_Dgenome_genomewide' genes 4
+
+#libName <- "cluster_members"
+#featureName <- unlist(strsplit("NLR_genes_in_Agenome_genomewide,NLR_genes_in_Bgenome_genomewide,NLR_genes_in_Dgenome_genomewide",
+#                               split = ","))
+#region <- "genes"
+#quantiles <- 4
+
+args <- commandArgs(trailingOnly = T)
+libName <- args[1]
+featureName <- unlist(strsplit(args[2],
+                               split = ","))
+region <- args[3]
+quantiles <- as.numeric(args[4])
+
+library(parallel)
+library(tidyr)
+library(dplyr)
+library(ggplot2)
+library(ggbeeswarm)
+library(ggthemes)
+library(ggtext)
+library(grid)
+library(gridExtra)
+library(extrafont)
+
+if(libName %in% c("cMMb", "cluster_members")) {
+  outDir <- paste0("quantiles_by_", libName, "/")
+} else {
+  outDir <- paste0("quantiles_by_", libName,
+                   "_in_", region, "/")
+}
+plotDir <- paste0(outDir, "plots/")
+system(paste0("[ -d ", outDir, " ] || mkdir ", outDir))
+system(paste0("[ -d ", plotDir, " ] || mkdir ", plotDir))
+
+# Define plot titles
+if(libName == "cMMb") {
+  featureNamePlot <- paste0("cM/Mb ",
+                            substr(featureName[1], start = 1, stop = 3),
+                            " quantiles")
+} else if(libName == "cluster_members") {
+  featureNamePlot <- paste0(substr(featureName[1], start = 1, stop = 3),
+                            " cluster size",
+                            " quantiles")
+} else {
+  featureNamePlot <- paste0(libName, " ",
+                            substr(featureName[1], start = 1, stop = 3),
+                            " quantiles (", region, ")")
+}
+ranFeatNamePlot <- paste0("Random ",
+                          substr(featureName[1], start = 1, stop = 3),
+                          " quantiles")
+
+# Define quantile colours
+quantileColours <- c("red", "purple", "blue", "navy")
+makeTransparent <- function(thisColour, alpha = 250)
+{
+  newColour <- col2rgb(thisColour)
+  apply(newColour, 2, function(x) {
+    rgb(red = x[1], green = x[2], blue = x[3],
+        alpha = alpha, maxColorValue = 255)
+  })
+}
+quantileColours <- makeTransparent(quantileColours)
+
+# Genomic definitions
+chrs <- paste0(rep("chr", 21), rep(1:7, 3),
+               c(rep("A", 7), rep("B", 7), rep("D", 7)))
+# Subset chrs to only those within a given subgenome
+genomeLetter <- unlist(strsplit(gsub("NLR_genes_in_", "",
+                                     gsub("genome_genomewide", "", featureName)),
+                                split = "_"))
+if(length(genomeLetter) == 1) {
+  chrs <- chrs[grepl(genomeLetter, chrs)]
+}
+
+# Load table of features grouped into quantiles
+if(libName %in% c("cMMb", "cluster_members")) {
+featuresDF <- read.table(paste0(outDir,
+                                "/WesternEurope/features_", quantiles, "quantiles_by_",
+                                libName, "_of_",
+                                substring(featureName[1][1], first = 1, last = 9), "_in_",
+                                paste0(substring(featureName, first = 14, last = 20),
+                                       collapse = "_"), "_",
+                                substring(featureName[1][1], first = 22), "_WesternEurope.txt"),
+                         header = T, sep = "\t")
+} else {
+featuresDF <- read.table(paste0(outDir,
+                                "/WesternEurope/features_", quantiles, "quantiles_by_",
+                                libName, "_in_",
+                                region, "_of_",
+                                substring(featureName[1][1], first = 1, last = 9), "_in_",
+                                paste0(substring(featureName, first = 14, last = 20),
+                                       collapse = "_"), "_",
+                                substring(featureName[1][1], first = 22), "_WesternEurope.txt"),
+                         header = T, sep = "\t")
+}
+
+featuresDF <- featuresDF[featuresDF$NLR_quantile != "",]
+rownames(featuresDF) <- as.character(1:dim(featuresDF)[1])
+# Get row indices for each feature quantile
+quantileIndices <- lapply(1:quantiles, function(k) {
+  which(featuresDF$NLR_quantile == paste0("Quantile ", k))
+})
+
+## Random feature quantiles
+# Define function to randomly select n rows from
+# a data.frame
+selectRandomFeatures <- function(features, n) {
+  return(features[sample(x = dim(features)[1],
+                         size = n,
+                         replace = FALSE),])
+}
+
+# Define seed so that random selections are reproducible
+set.seed(453838430)
+
+# Divide features into random sets of equal number,
+# with the same number of genes per chromosome as
+# above-defined libName-defined feature quantiles
+randomPCIndices <- lapply(1:quantiles, function(k) {
+  randomPCIndicesk <- NULL
+  for(x in 1:length(chrs)) {
+    randomPCfeatureskChr <- selectRandomFeatures(features = featuresDF[featuresDF$seqnames == chrs[x],],
+                                                 n = dim(featuresDF[featuresDF$NLR_quantile == paste0("Quantile ", k) &
+                                                                    featuresDF$seqnames == chrs[x],])[1])
+    if(dim(randomPCfeatureskChr)[1] > 0) {
+      randomPCIndicesk <- c(randomPCIndicesk, as.integer(rownames(randomPCfeatureskChr)))
+    }
+  }
+  randomPCIndicesk
+})
+# Confirm per-chromosome feature numbers are the same for quantiles and random groupings
+lapply(seq_along(1:quantiles), function(k) {
+  print(k)
+  sapply(seq_along(chrs), function(x) {
+    print(x)
+    if(!identical(dim(featuresDF[randomPCIndices[[k]],][featuresDF[randomPCIndices[[k]],]$seqnames == chrs[x],]),
+                  dim(featuresDF[quantileIndices[[k]],][featuresDF[quantileIndices[[k]],]$seqnames == chrs[x],])))     {
+      stop("Quantile features and random features do not consist of the same number of features per chromosome")
+    }
+  })
+})
+
+featuresDFtmp <- data.frame(featuresDF,
+                            random = as.character(""),
+                            stringsAsFactors = F)
+ranFeatsDF <- data.frame()
+for(k in 1:quantiles) {
+  featuresDFtmp[randomPCIndices[[k]],]$random <- paste0("Random ", k)
+  ranFeatsDFk <- featuresDFtmp[featuresDFtmp$random == paste0("Random ", k),]
+  ranFeatsDF <- rbind(ranFeatsDF, ranFeatsDFk)
+}
+
+# Calculate means, SDs, SEMs and 95% CIs
+# and create dataframe of summary statistics for plotting
+featuresDF_quantileMean <- sapply(1:quantiles, function(k) {
+  mean(featuresDF[featuresDF$NLR_quantile == paste0("Quantile ", k),]$cluster_members, na.rm = T)
+})
+featuresDF_quantileSD <- sapply(1:quantiles, function(k) {
+  sd(featuresDF[featuresDF$NLR_quantile == paste0("Quantile ", k),]$cluster_members, na.rm = T)
+})
+featuresDF_quantileSEM <- sapply(1:quantiles, function(k) {
+  featuresDF_quantileSD[k] / sqrt( (dim(featuresDF[featuresDF$NLR_quantile == paste0("Quantile ", k),])[1] - 1) )
+})
+featuresDF_quantileCIlower <- sapply(1:quantiles, function(k) {
+  featuresDF_quantileMean[k] -
+    ( qt(0.975, df = dim(featuresDF[featuresDF$NLR_quantile == paste0("Quantile ", k),])[1]-1 ) *
+      featuresDF_quantileSEM[k] )
+})
+featuresDF_quantileCIupper <- sapply(1:quantiles, function(k) {
+  featuresDF_quantileMean[k] +
+    ( qt(0.975, df = dim(featuresDF[featuresDF$NLR_quantile == paste0("Quantile ", k),])[1]-1 ) *
+      featuresDF_quantileSEM[k] )
+})
+featuresDF_summary_stats <- data.frame(NLR_quantile = paste0("Quantile ", 1:quantiles),
+                                       Mean = featuresDF_quantileMean,
+                                       SD = featuresDF_quantileSD,
+                                       SEM = featuresDF_quantileSEM,
+                                       CIlower = featuresDF_quantileCIlower,
+                                       CIupper = featuresDF_quantileCIupper,
+                                       stringsAsFactors = F)
+
+ranFeatsDF_randomMean <- sapply(1:quantiles, function(k) {
+  mean(ranFeatsDF[ranFeatsDF$random == paste0("Random ", k),]$cluster_members, na.rm = T)
+})
+ranFeatsDF_randomSD <- sapply(1:quantiles, function(k) {
+  sd(ranFeatsDF[ranFeatsDF$random == paste0("Random ", k),]$cluster_members, na.rm = T)
+})
+ranFeatsDF_randomSEM <- sapply(1:quantiles, function(k) {
+  ranFeatsDF_randomSD[k] / sqrt( (dim(ranFeatsDF[ranFeatsDF$random == paste0("Random ", k),])[1] - 1) )
+})
+ranFeatsDF_randomCIlower <- sapply(1:quantiles, function(k) {
+  ranFeatsDF_randomMean[k] -
+    ( qt(0.975, df = dim(ranFeatsDF[ranFeatsDF$random == paste0("Random ", k),])[1]-1 ) *
+      ranFeatsDF_randomSEM[k] )
+})
+ranFeatsDF_randomCIupper <- sapply(1:quantiles, function(k) {
+  ranFeatsDF_randomMean[k] +
+    ( qt(0.975, df = dim(ranFeatsDF[ranFeatsDF$random == paste0("Random ", k),])[1]-1 ) *
+      ranFeatsDF_randomSEM[k] )
+})
+ranFeatsDF_summary_stats <- data.frame(random = paste0("Random ", 1:quantiles),
+                                       Mean = ranFeatsDF_randomMean,
+                                       SD = ranFeatsDF_randomSD,
+                                       SEM = ranFeatsDF_randomSEM,
+                                       CIlower = ranFeatsDF_randomCIlower,
+                                       CIupper = ranFeatsDF_randomCIupper,
+                                       stringsAsFactors = F)
+summary_stats_min <- min(c(featuresDF_summary_stats$CIlower, ranFeatsDF_summary_stats$CIlower), na.rm = T)
+summary_stats_max <- max(c(featuresDF_summary_stats$CIupper, ranFeatsDF_summary_stats$CIupper), na.rm = T)
+
+# Take top ##% of data to aid visualisation in density plots
+featuresDF <- featuresDF[which(featuresDF$cluster_members <=
+                               quantile(featuresDF$cluster_members,
+                                        probs = 1.0, na.rm = T)),]
+ranFeatsDF <- ranFeatsDF[which(ranFeatsDF$cluster_members <=
+                               quantile(ranFeatsDF$cluster_members,
+                                        probs = 1.0, na.rm = T)),]
+
+xmin <- min(c(
+              featuresDF[unlist(quantileIndices),]$cluster_members,
+              featuresDF[unlist(randomPCIndices),]$cluster_members
+             ), na.rm = T)
+xmax <- max(c(
+              featuresDF[unlist(quantileIndices),]$cluster_members,
+              featuresDF[unlist(randomPCIndices),]$cluster_members
+             ), na.rm = T)
+minDensity <- 0
+maxDensity <- max(density(featuresDF[featuresDF$NLR_quantile == "Quantile 4",]$cluster_members,
+                          na.rm = T)$y)+0.04
+maxDensity <- max(
+  c(
+    sapply(1:quantiles, function(k) {
+      max(c(max(density(featuresDF[featuresDF$NLR_quantile == paste0("Quantile ", k),]$cluster_members,
+                        na.rm = T)$y),
+            max(density(ranFeatsDF[ranFeatsDF$random == paste0("Random ", k),]$cluster_members,
+                        na.rm = T)$y)))
+     })
+   )
+)+0.04
+
+# Define legend labels
+legendLabs_feature <- lapply(1:quantiles, function(x) {
+  grobTree(textGrob(bquote(.(paste0("Quantile ", 1:quantiles)[x])),
+                    x = 0.65, y = 0.90-((x-1)*0.07), just = "left",
+                    gp = gpar(col = quantileColours[x], fontsize = 22)))
+})
+legendLabs_ranFeat <- lapply(1:quantiles, function(x) {
+  grobTree(textGrob(bquote(.(paste0("Random ", 1:quantiles)[x])),
+                    x = 0.65, y = 0.90-((x-1)*0.07), just = "left",
+                    gp = gpar(col = quantileColours[x], fontsize = 22)))
+})
+
+# Cluster size density plot function
+cluster_members_plotFun <- function(lociDF,
+                         parameter,
+                         parameterLab,
+                         featureGroup,
+                         featureNamePlot,
+                         legendLabs,
+                         quantileColours) {
+  ggplot(data = lociDF,
+         mapping = aes(x = get(parameter),
+                       colour = reorder(x = get(featureGroup), X = desc(get(featureGroup))),
+                       group = reorder(x = get(featureGroup), X = desc(get(featureGroup))))) +
+  scale_colour_manual(values = rev(quantileColours)) +
+  geom_density(size = 1.5) +
+  scale_x_continuous(limits = c(xmin, xmax),
+                     labels = function(x) sprintf("%1.1f", x)) +
+  scale_y_continuous(limits = c(minDensity, maxDensity),
+                     labels = function(x) sprintf("%1.1f", x)) +
+  labs(x = parameterLab,
+       y = "Density") +
+  annotation_custom(legendLabs[[1]]) +
+  annotation_custom(legendLabs[[2]]) +
+  annotation_custom(legendLabs[[3]]) +
+  annotation_custom(legendLabs[[4]]) +
+  theme_bw() +
+  theme(axis.line.y = element_line(size = 2.0, colour = "black"),
+        axis.line.x = element_line(size = 2.0, colour = "black"),
+        axis.ticks.y = element_line(size = 2.0, colour = "black"),
+        axis.ticks.x = element_line(size = 2.0, colour = "black"),
+        axis.ticks.length = unit(0.25, "cm"),
+        axis.text.y = element_text(size = 18, colour = "black", family = "Luxi Mono"),
+        axis.text.x = element_text(size = 18, colour = "black", family = "Luxi Mono"),
+        axis.title = element_text(size = 26, colour = "black"),
+        legend.position = "none",
+        panel.grid = element_blank(),
+        panel.border = element_blank(),
+        panel.background = element_blank(),
+        plot.margin = unit(c(0.3,1.2,0.3,0.3),"cm"),
+        plot.title = element_text(hjust = 0.5, size = 30)) +
+  ggtitle(bquote(.(featureNamePlot)))
+}
+
+# Plot means and 95% confidence intervals
+cluster_members_meanCIs <- function(dataFrame,
+                         parameterLab,
+                         featureGroup,
+                         featureNamePlot,
+                         quantileColours) {
+  ggplot(data = dataFrame,
+         mapping = aes(x = get(featureGroup),
+                       y = Mean,
+                       colour = get(featureGroup))) +
+  labs(colour = "") +
+  geom_point(shape = 19, size = 6, position = position_dodge(width = 0.2)) +
+  geom_errorbar(mapping = aes(ymin = CIlower,
+                              ymax = CIupper),
+                width = 0.2, size = 2, position = position_dodge(width = 0.2)) +
+  scale_colour_manual(values = quantileColours) +
+  scale_y_continuous(limits = c(summary_stats_min, summary_stats_max),
+                     labels = function(x) sprintf("%1.1f", x)) +
+  labs(x = "",
+       y = parameterLab) +
+  theme_bw() +
+  theme(axis.line.y = element_line(size = 2.0, colour = "black"),
+        axis.ticks.y = element_line(size = 2.0, colour = "black"),
+        axis.ticks.x = element_blank(),
+        axis.ticks.length = unit(0.25, "cm"),
+        axis.text.y = element_text(size = 18, colour = "black", family = "Luxi Mono"),
+        axis.text.x = element_text(size = 22, colour = quantileColours, hjust = 1.0, vjust = 1.0, angle = 45),
+        axis.title = element_text(size = 26, colour = "black"),
+        legend.position = "none",
+        panel.grid = element_blank(),
+        panel.border = element_blank(),
+        panel.background = element_blank(),
+        plot.margin = unit(c(0.3,1.2,0.1,0.3),"cm"),
+        plot.title = element_text(hjust = 0.5, size = 30)) +
+  ggtitle(bquote(.(featureNamePlot)))
+}
+
+ggObjGA_feature <- cluster_members_plotFun(lociDF = featuresDF,
+                                parameter = "cluster_members",
+                                parameterLab = "Cluster size",
+                                featureGroup = "NLR_quantile", 
+                                featureNamePlot = featureNamePlot,
+                                legendLabs = legendLabs_feature,
+                                quantileColours = quantileColours
+                               )
+ggObjGA_ranFeat <- cluster_members_plotFun(lociDF = ranFeatsDF,
+                                parameter = "cluster_members",
+                                parameterLab = "Cluster size",
+                                featureGroup = "random", 
+                                featureNamePlot = ranFeatNamePlot,
+                                legendLabs = legendLabs_ranFeat,
+                                quantileColours = quantileColours
+                               )
+ggObjGA_feature_mean <- cluster_members_meanCIs(dataFrame = featuresDF_summary_stats,
+                                     parameterLab = "Cluster size",
+                                     featureGroup = "NLR_quantile",
+                                     featureNamePlot = featureNamePlot,
+                                     quantileColours = quantileColours
+                                    )
+ggObjGA_ranFeat_mean <- cluster_members_meanCIs(dataFrame = ranFeatsDF_summary_stats,
+                                     parameterLab = "Cluster size",
+                                     featureGroup = "random",
+                                     featureNamePlot = ranFeatNamePlot,
+                                     quantileColours = quantileColours
+                                    )
+ggObjGA_combined <- grid.arrange(ggObjGA_feature,
+                                 ggObjGA_feature_mean,
+                                 ggObjGA_ranFeat,
+                                 ggObjGA_ranFeat_mean,
+                                 ncol = 2, as.table = F)
+if(libName %in% c("cMMb", "cluster_members")) {
+ggsave(paste0(plotDir,
+              "cluster_sizes_for_", quantiles, "quantiles",
+              "_by_", libName, "_of_",
+              substring(featureName[1][1], first = 1, last = 9), "_in_",
+              paste0(substring(featureName, first = 14, last = 20),
+                     collapse = "_"), "_",
+              substring(featureName[1][1], first = 22), ".pdf"),
+       plot = ggObjGA_combined,
+       height = 13, width = 14)
+} else {
+ggsave(paste0(plotDir,
+              "cluster_sizes_for_", quantiles, "quantiles",
+              "_by_", libName, "_in_", region, "_of_",
+              substring(featureName[1][1], first = 1, last = 9), "_in_",
+              paste0(substring(featureName, first = 14, last = 20),
+                     collapse = "_"), "_",
+              substring(featureName[1][1], first = 22), ".pdf"),
+       plot = ggObjGA_combined,
+       height = 13, width = 14)
+}
