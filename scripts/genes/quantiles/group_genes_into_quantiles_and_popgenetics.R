@@ -1,10 +1,10 @@
 #!/applications/R/R-3.5.0/bin/Rscript
 
-# derived from a Chinese Spring × Renan genetic map.
-
-# Calculate population genetics statistics, mean recombination rate (cM/Mb) and coverage values for each gene.
-# Use these values as ordering factors for dividing genes into groups corresponding to genes in
-# given percentile ranges with regard to these values.
+# Calculate population genetics statistics,
+# mean recombination rate (cM/Mb) and mean coverage values for each gene.
+# Use these values as ordering factors for dividing genes
+# into groups corresponding to genes in given
+# percentile ranges with regard to these values.
 
 # Usage:
 # /applications/R/R-3.5.0/bin/Rscript group_genes_into_quantiles_and_popgenetics.R 'genes_in_Agenome_genomewide,genes_in_Bgenome_genomewide,genes_in_Dgenome_genomewide' genes
