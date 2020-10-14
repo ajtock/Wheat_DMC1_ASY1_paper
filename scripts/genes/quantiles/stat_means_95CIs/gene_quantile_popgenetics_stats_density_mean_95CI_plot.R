@@ -196,7 +196,6 @@ selectRandomFeatures <- function(features, n) {
 }
 
 # Define seed so that random selections are reproducible
-#set.seed(93750174)
 set.seed(453838430)
 
 # Divide features into random sets of equal number,
