@@ -4,7 +4,7 @@
 # of physical cluster size for each group of NLR genes
 
 # Usage:
-# /applications/R/R-3.5.0/bin/Rscript NLR_gene_quantile_cluster_members_density_mean_95CI_plot.R cluster_members 'NLR_genes_in_Agenome_genomewide,NLR_genes_in_Bgenome_genomewide,NLR_genes_in_Dgenome_genomewide' genes 4
+# /applications/R/R-3.5.0/bin/Rscript NLR_gene_quantile_cluster_size_density_mean_95CI_plot.R cluster_members 'NLR_genes_in_Agenome_genomewide,NLR_genes_in_Bgenome_genomewide,NLR_genes_in_Dgenome_genomewide' genes 4
 
 #libName <- "cluster_members"
 #featureName <- unlist(strsplit("NLR_genes_in_Agenome_genomewide,NLR_genes_in_Bgenome_genomewide,NLR_genes_in_Dgenome_genomewide",
