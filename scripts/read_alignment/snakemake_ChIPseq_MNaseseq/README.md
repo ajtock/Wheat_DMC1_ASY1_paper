@@ -1,6 +1,4 @@
-# snakemake\_ChIPseq\_MNaseseq
-
-## Automated workflow for paired-end ChIP-seq and MNase-seq data processing and alignment
+# Automated workflow for paired-end ChIP-seq and MNase-seq data processing and alignment
 
 This is a Snakemake workflow for automated processing and alignment of paired-end read data derived from chromatin immunoprecipitation or micrococcal nuclease digestion followed by high-throughput sequencing (ChIP-seq or MNase-seq).
 
