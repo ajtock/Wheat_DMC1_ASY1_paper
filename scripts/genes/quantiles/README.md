@@ -9,4 +9,6 @@ To compute population genetics statistics for each gene, this script also requir
 
 `gene_quantile_cMMb_density_mean_95CI_plot.R` plots density and means with 95% CIs of recombination rate for each group of genes.
 
-`gene_quantile_popgenetics_stats_density_mean_95CI_plot.R` plots density and means with 95% CIs of a given population genetics statistic for each group of genes
+`gene_quantile_popgenetics_stats_density_mean_95CI_plot.R` plots density and means with 95% CIs of a given population genetics statistic for each group of genes.
+
+`topGO_gene_quantiles.R` and `topGOslim_gene_quantiles.R` use the Bioconductor package [topGO](https://bioconductor.org/packages/release/bioc/html/topGO.html) to evaluate groups of genes ("quantiles", defined by decreasing crossover recombination rate or ChIP-seq signal) for over-representation gene ontology (GO) and high-level GO (GO slim) terms, respectively.
