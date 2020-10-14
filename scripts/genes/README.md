@@ -4,6 +4,8 @@ This subdirectoy contains a Snakemake workflow for creating a matrix of windowed
 
 It also contains R scripts for creating a matrix of windowed SNP (`1000exomes_SNP_profiles_around_genes_commandArgs.R`) or transposable element (`TE_superfamily_profiles_around_genes_commandArgs.R`) frequency values within genes and in flanking regions.
 
+Scripts for defining and evaluating groups of genes are located in [quantiles/](https://github.com/ajtock/Wheat_DMC1_ASY1_paper/tree/master/scripts/genes/quantiles).
+
 ### Requirements
 
 - Installation of [Snakemake](https://snakemake.readthedocs.io/en/stable/) and optionally [conda](https://conda.io/docs/)
