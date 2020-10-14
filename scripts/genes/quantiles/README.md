@@ -12,3 +12,6 @@ To compute population genetics statistics for each gene, this script also requir
 `stat_means_95CIs/gene_quantile_popgenetics_stats_density_mean_95CI_plot.R` plots density and means with 95% CIs of a given population genetics statistic for each group of genes.
 
 `GO_term_enrichment/topGO_gene_quantiles.R` and `GO_term_enrichment/topGOslim_gene_quantiles.R` use the Bioconductor package [topGO](https://bioconductor.org/packages/release/bioc/html/topGO.html) to evaluate groups of genes ("quantiles", defined by decreasing crossover recombination rate or ChIP-seq signal) for over-representation gene ontology (GO) and high-level GO (GO slim) terms, respectively.
+
+`hypergeometric_tests/proportion_*_in_gene_quantiles_hypergeometricTest.R` scripts evaluate different gene categories for over- and under-representation in each group of genes ("quantile") by applying hypergeometric tests.
+These scripts also sample from the hypergeometric distribution 100,000 times to obtain a probability distribution for plotting the log<sub>2</sub>(observed/expected) ratio and significance threshold (\alpha=0.05).
