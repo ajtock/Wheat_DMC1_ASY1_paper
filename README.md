@@ -23,6 +23,10 @@ These workflows are located in [scripts/read_alignment/](https://github.com/ajto
 
 Scripts for analyzing ChIP-seq peaks and genes are located in [scripts/ChIPseq_peaks/](https://github.com/ajtock/Wheat_DMC1_ASY1_paper/tree/master/scripts/ChIPseq_peaks) and [scripts/genes/](https://github.com/ajtock/Wheat_DMC1_ASY1_paper/tree/master/scripts/genes).
 
+## Chromosome profiles
+
+Scripts for calculating and plotting windowed library-size-normalized log2(ChIP/control) coverage, recombination rate (cM/Mb), and feature frequency along the wheat chromosomes are located in [scripts/chromosomes/](https://github.com/ajtock/Wheat_DMC1_ASY1_paper/tree/master/scripts/chromosomes).
+
 ## Chromosome compartments
 
 Previously defined coordinates delimiting compartments of the chromosomes of hexaploid wheat landrace Chinese Spring are detailed in [chromosome_compartments/](https://github.com/ajtock/Wheat_DMC1_ASY1_paper/tree/master/chromosome_compartments).
