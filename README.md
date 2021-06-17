@@ -1,8 +1,8 @@
 # Wheat DMC1 and ASY1 ChIP-seq custom scripts
 
-This repository contains custom scripts used in the preparation of the paper entitled "Crossover-active regions of the wheat genome are distinguished by DMC1, the chromosome axis, H3K27me3 and signatures of adaptation" by Andrew J. Tock, Daniel M. Holland, Wei Jiang, Kim Osman, Eugenio Sanchez-Moran, James D. Higgins, Keith J. Edwards, Cristobal Uauy, F.C.H. Franklin and Ian R. Henderson.
+This repository contains custom scripts used in the preparation of the paper entitled "Crossover-active regions of the wheat genome are distinguished by DMC1, the chromosome axis, H3K27me3 and signatures of adaptation" by Andrew J. Tock, Daniel M. Holland, Wei Jiang, Kim Osman, Eugenio Sanchez-Moran, James D. Higgins, Keith J. Edwards, Cristobal Uauy, F. Chris H. Franklin and Ian R. Henderson.
 
-These files can be downloaded together by cloning the repository:
+These files can be downloaded together by cloning the repository, which requires `git`:
 
 ```
 git clone https://github.com/ajtock/Wheat_DMC1_ASY1_paper/
